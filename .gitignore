@@ -5,11 +5,6 @@ node_modules/
 
 # Testing
 coverage/
-SeleniumTest.java
-*.class
-*.jar
-drivers/
-selenium-server-standalone.jar
 
 # Production
 dist/
@@ -22,6 +17,9 @@ build/
 .env.development.local
 .env.test.local
 .env.production.local
+
+# Uploads (user data, auto-created at runtime)
+server/uploads/
 
 # Logs
 npm-debug.log*

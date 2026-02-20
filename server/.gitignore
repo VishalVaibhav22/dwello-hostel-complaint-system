@@ -18,6 +18,9 @@ yarn-error.log*
 *.swo
 *~
 
+# Uploads (user data, auto-created at runtime)
+uploads/
+
 # OS
 .DS_Store
 Thumbs.db

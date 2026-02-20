@@ -1,129 +1,126 @@
-# Dwello - Complaint Management System
+# Dwello — Hostel Complaint Management System
 
-## Project Overview
+A full-stack web application for hostel residents to report issues and for administrators to track, manage, and resolve them. Built with the MERN stack.
 
-Dwello is a web-based complaint management system designed to simplify issue reporting and resolution within residential institutions such as hostels. It provides a centralized digital interface for residents to submit complaints and for administrators to monitor, manage, and resolve them in an organized manner. The system focuses on improving transparency, accountability, and ease of use by replacing manual complaint tracking with a structured digital workflow.
+## Features
 
-## Key Features
+### Student
 
-- **Student and Admin Access**: Separate dashboards for students and administrators, providing role-appropriate views and actions.
-- **Complaint Submission System**: Students can raise complaints by specifying hostel, room number, and issue details through a structured form.
-- **Complaint Status Management**: Complaints follow a clear lifecycle (Open → In Progress → Resolved), managed by administrators and visible to students.
-- **Authentication and Authorization**: Secure login using JWT-based authentication, ensuring protected access to student and admin functionalities.
-- **Responsive User Interface**: Clean and responsive interface designed to work effectively across desktops, tablets, and mobile devices.
-- **Persistent Data Storage**: Complaint and user data are stored reliably using MongoDB, ensuring consistency and data integrity.
+- Submit complaints with title, description, images (up to 3), and availability slots
+- Track complaint status through a clear lifecycle: **Open → In Progress → Resolved**
+- View rejection reasons when a complaint is declined
+- Receive real-time notifications on status changes
+- Browse admin-published announcements
+
+### Admin
+
+- Dashboard with complaint overview and quick status updates
+- **Analytics page** — status distribution, resolution time trends, response rate, daily/weekly charts
+- **All Complaints view** — search, filter, sort across all complaints with student details
+- **Student management** — browse all registered students with complaint statistics
+- **Announcements** — create and manage hostel-wide announcements
+- Reject complaints with a mandatory reason
+- View uploaded images with authenticated access
+
+### General
+
+- JWT-based authentication with role-based access control (student / admin)
+- Responsive UI across desktop, tablet, and mobile
+- Collapsible sidebar navigation
+- University-specific registration 
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|------------|
-| **Frontend** | React.js, Vite, Tailwind CSS, Framer Motion |
-| **Backend** | Node.js, Express.js |
-| **Database** | MongoDB (Mongoose ODM) |
-| **Authentication** | JSON Web Tokens (JWT), bcryptjs |
-| **Testing** | Selenium WebDriver |
-
-## System Architecture
-
-The application follows a standard Model-View-Controller (MVC) architectural pattern within a decoupled client-server setup:
-
-1.  **Client (Frontend)**: A Single Page Application (SPA) built with React that consumes RESTful APIs. It handles client-side routing, state management, and UI rendering.
-2.  **Server (Backend)**: An Express.js REST API that serves as the interface between the client and the database. It enforces business logic, validation, and security policies.
-3.  **Database**: MongoDB stores relational data (users, complaints) in document format, optimized for query performance.
+| Layer       | Technology                                  |
+| ----------- | ------------------------------------------- |
+| Frontend    | React 18, Vite, Tailwind CSS, Framer Motion |
+| Backend     | Node.js, Express.js                         |
+| Database    | MongoDB (Mongoose ODM)                      |
+| Auth        | JWT, bcryptjs                               |
+| File Upload | Multer                                      |
+| Validation  | express-validator                           |
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js (v18.0.0 or higher)
-- MongoDB instance (Local or Atlas)
-
+- Node.js ≥ 18
+- MongoDB (local or Atlas)
 
 ### Installation
 
-1.  **Clone the repository**
-    ```bash
-    git clone https://github.com/VishalVaibhav22/dwello-hostel-complaint-system.git
-    cd dwello-hostel-complaint-system
-    ```
+```bash
+# Clone
+git clone https://github.com/VishalVaibhav22/dwello-hostel-complaint-system.git
+cd dwello-hostel-complaint-system
 
-2.  **Server Setup**
-    ```bash
-    cd server
-    npm install
-    ```
+# Install client dependencies
+npm install
 
-3.  **Client Setup**
-    ```bash
-    cd ..
-    npm install
-    ```
+# Install server dependencies
+cd server
+npm install
+```
 
-### Running the Application
+### Environment Variables
 
-1.  **Start Backend**
-    ```bash
-    cd server
-    npm start
-    ```
-    Server runs on `http://localhost:5000`
-
-2.  **Start Frontend**
-    ```bash
-    # In a new terminal
-    npm run dev
-    ```
-    Client runs on `http://localhost:5173`
-
-## Environment Variables
-
-Create a `.env` file in the `server/` directory with the following configuration:
+Create `server/.env`:
 
 ```env
 PORT=5000
 MONGODB_URI=mongodb://localhost:27017/hostel-complaint
-JWT_SECRET=your_jwt_secret_key_change_this_in_production
+JWT_SECRET=your_jwt_secret_key
 NODE_ENV=development
 ADMIN_EMAIL=admin@example.com
 ADMIN_PASSWORD=change_this_password
 ```
 
-## Application Flow
+### Run
 
-1.  **User Registration**: Students register with their hostel details. Password is secured via bcrypt.
-2.  **Authentication**: User logs in and receives a JWT for session authorization.
-3.  **Complaint Submission**: Student submits a complaint with category and description.
-4.  **Admin Review**: Administrators view a global dashboard of all active complaints.
-5.  **Resolution**: Admin updates status (e.g., Open -> Resolved), which is immediately reflected on the student dashboard.
+```bash
+# Terminal 1 — Backend
+cd server
+npm start
+# → http://localhost:5000
 
-## Modules / Screens Overview
+# Terminal 2 — Frontend
+npm run dev
+# → http://localhost:5173
+```
 
-### Student Module
--   **Landing Page**: Product overview and entry point.
--   **Dashboard**: Personal view of submitted complaints and their live status.
--   **Submission Form**: Interface for reporting new issues.
+On first launch, an admin account is automatically created from the `ADMIN_EMAIL` and `ADMIN_PASSWORD` environment variables.
 
-### Admin Module
--   **Master Dashboard**: Aggregated view of all hostel complaints.
--   **Status Management**: Controls to update complaint progress.
--   **User Oversight**: View student details associated with specific complaints.
+## Project Structure
 
-## Testing Strategy
+```
+├── server/
+│   ├── controllers/        # Business logic (auth, complaints, admin, notifications, announcements)
+│   ├── middleware/          # JWT auth, admin role guard, multer upload config
+│   ├── models/              # Mongoose schemas (User, Complaint, Notification, Announcement)
+│   ├── routes/              # Express route definitions
+│   ├── utils/               # Admin seeder
+│   └── server.js            # Entry point
+│
+├── src/
+│   ├── api/                 # Axios client and API functions
+│   ├── components/          # Shared components (Logo)
+│   ├── context/             # AuthContext (React Context)
+│   ├── layouts/             # StudentLayout (sidebar + header)
+│   ├── pages/               # All route-level pages
+│   └── utils/               # Constants
+│
+├── docs/                    # API reference and architecture docs
+└── public/                  # Static assets
+```
 
-Basic automated testing has been implemented to validate core user flows of the application.
+## API Reference
 
-- Selenium-based test scripts are used to verify key functionalities such as user login and basic navigation.
-- Testing currently focuses on validating essential workflows rather than full coverage.
-- Additional test cases and deeper coverage are planned as part of future enhancements.
+See [docs/API_REFERENCE.md](docs/API_REFERENCE.md) for the full endpoint documentation.
 
-## Future Enhancements
+## Architecture
 
--   **Notification Service Integration**: Implement email notifications to inform students and administrators about updates in complaint status, improving communication and transparency.
--   **Analytics and Insights Dashboard**: Introduce an analytics module to visualize complaint trends, resolution timelines, and workload distribution, helping administration make data-driven decisions.
--   **Image Support for Complaints**: Allow students to attach images while submitting complaints to provide clearer context and assist maintenance staff in faster issue assessment.
--   **Intelligent Complaint Categorization**: Incorporate AI-based text analysis to automatically categorize complaints based on their description, reducing manual effort and improving routing accuracy.
--   **Scalable Hostel Management (Multi-Tenancy)**: Extend the system to support multiple hostels or blocks, each with dedicated administrative access while maintaining centralized oversight.
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for system design details.
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE.md) file for details.
+MIT — see [LICENSE.md](LICENSE.md)

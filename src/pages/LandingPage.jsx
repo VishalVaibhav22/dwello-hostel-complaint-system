@@ -36,7 +36,7 @@ const LandingPage = () => {
       tab: "Reporting",
       title: "Digital Reporting",
       description:
-        "Submit complaints by selecting hostel, room number, and issue type for accurate handling.",
+        "Report hostel issues in seconds with structured details for faster, accurate resolution.",
       theme: {
         main: "blue-600",
         bg: "bg-blue-600",
@@ -65,7 +65,7 @@ const LandingPage = () => {
       tab: "Tracking",
       title: "Status Tracking",
       description:
-        "View the current status of complaints from submission to resolution.",
+        "Track your complaint in real time from submission to final resolution.",
       theme: {
         main: "green-500",
         bg: "bg-green-500",
@@ -94,7 +94,7 @@ const LandingPage = () => {
       tab: "Communications",
       title: "Notifications",
       description:
-        "Receive updates whenever the status of a complaint changes.",
+        "Get timely updates whenever your complaint status is updated.",
       theme: {
         main: "purple-600",
         bg: "bg-purple-600",
@@ -232,20 +232,19 @@ const LandingPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <nav className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12 h-14 flex justify-between items-center">
+          <Logo
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          />
 
-      <nav className="bg-white/90 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50 shadow-sm">
-        <div className="max-w-[1440px] mx-auto px-6 md:px-8 lg:px-12 py-4 flex justify-between items-center">
-          <Logo />
-
-
-          <div className="flex items-center space-x-2">
-
+          <div className="flex items-center space-x-1 sm:space-x-2">
             <div
-              className="relative"
+              className="relative hidden md:block"
               onMouseEnter={() => setShowHowItWorks(true)}
               onMouseLeave={() => setShowHowItWorks(false)}
             >
-              <button className="flex items-center space-x-1 text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all px-3 py-2 rounded-lg text-sm font-normal">
+              <button className="flex items-center space-x-1 text-textSecondary hover:text-textPrimary hover:bg-gray-50 transition-all px-3 py-2 rounded-lg text-sm font-medium">
                 <span>How It Works</span>
                 <svg
                   className={`w-4 h-4 transition-transform duration-200 ${showHowItWorks ? "rotate-180" : ""}`}
@@ -262,15 +261,14 @@ const LandingPage = () => {
                 </svg>
               </button>
 
-
               <div
-                className={`absolute top-full right-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden transition-all duration-200 origin-top-right ${showHowItWorks
-                  ? "opacity-100 scale-100 visible"
-                  : "opacity-0 scale-95 invisible"
-                  }`}
+                className={`absolute top-full right-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden transition-all duration-200 origin-top-right ${
+                  showHowItWorks
+                    ? "opacity-100 scale-100 visible"
+                    : "opacity-0 scale-95 invisible"
+                }`}
               >
                 <div className="p-2">
-
                   <div className="group p-4 rounded-lg hover:bg-blue-50 transition-all duration-200 cursor-pointer">
                     <div className="flex items-start space-x-3">
                       <div className="flex-shrink-0 w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center group-hover:bg-primary group-hover:scale-110 transition-all duration-200">
@@ -288,7 +286,6 @@ const LandingPage = () => {
                       </div>
                     </div>
                   </div>
-
 
                   <div className="group p-4 rounded-lg hover:bg-blue-50 transition-all duration-200 cursor-pointer">
                     <div className="flex items-start space-x-3">
@@ -309,7 +306,6 @@ const LandingPage = () => {
                     </div>
                   </div>
 
-
                   <div className="group p-4 rounded-lg hover:bg-blue-50 transition-all duration-200 cursor-pointer">
                     <div className="flex items-start space-x-3">
                       <div className="flex-shrink-0 w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center group-hover:bg-primary group-hover:scale-110 transition-all duration-200">
@@ -327,7 +323,6 @@ const LandingPage = () => {
                       </div>
                     </div>
                   </div>
-
 
                   <div className="group p-4 rounded-lg hover:bg-blue-50 transition-all duration-200 cursor-pointer">
                     <div className="flex items-start space-x-3">
@@ -352,13 +347,19 @@ const LandingPage = () => {
 
             <button
               onClick={() => navigate("/login")}
-              className="text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all px-4 py-2 rounded-lg text-sm font-normal"
+              className="sm:hidden text-textSecondary hover:text-textPrimary hover:bg-gray-50 transition-all px-4 py-2 rounded-lg text-sm font-medium min-h-[44px]"
+            >
+              Sign In
+            </button>
+            <button
+              onClick={() => navigate("/login")}
+              className="hidden sm:block text-textSecondary hover:text-textPrimary hover:bg-gray-50 transition-all px-4 py-2 rounded-lg text-sm font-medium"
             >
               Sign In
             </button>
             <button
               onClick={() => navigate("/register")}
-              className="bg-primary hover:bg-blue-800 text-white px-6 py-2.5 rounded-lg font-medium transition-all shadow-sm hover:shadow-md text-sm"
+              className="hidden sm:block bg-primary hover:bg-blue-800 text-white px-4 py-2 sm:px-6 rounded-lg font-medium transition-all shadow-sm hover:shadow-md text-sm"
             >
               Get Started
             </button>
@@ -366,11 +367,8 @@ const LandingPage = () => {
         </div>
       </nav>
 
-
-      <section className="relative bg-white py-24 lg:py-32 overflow-hidden">
-
+      <section className="relative bg-white py-12 sm:py-16 md:py-24 lg:py-32 overflow-hidden">
         <div className="absolute inset-0 bg-white">
-
           <div
             className="absolute inset-0"
             style={{
@@ -383,12 +381,11 @@ const LandingPage = () => {
           ></div>
         </div>
 
-        <div className="relative max-w-[1440px] mx-auto px-6 md:px-8 lg:px-12">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-
+        <div className="relative max-w-[1440px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-12 items-center">
             <div className="max-w-3xl">
               <h1
-                className="text-5xl lg:text-6xl font-bold text-gray-900 mb-6"
+                className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold text-textPrimary mb-4 sm:mb-6"
                 style={{ lineHeight: "1.1", letterSpacing: "-0.02em" }}
               >
                 Complaint Management
@@ -398,7 +395,7 @@ const LandingPage = () => {
               </h1>
 
               <p
-                className="text-xl text-gray-600 mb-10"
+                className="text-base sm:text-lg md:text-xl text-textSecondary mb-6 sm:mb-8 md:mb-10"
                 style={{ lineHeight: "1.7", letterSpacing: "-0.01em" }}
               >
                 A centralized platform for hostel residents to report issues,
@@ -406,11 +403,11 @@ const LandingPage = () => {
                 transparent manner.
               </p>
 
-              <div className="mb-16 flex flex-wrap gap-4">
+              <div className="mb-8 sm:mb-12 md:mb-16 flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4">
                 <button
                   id="getStartedBtn"
                   onClick={() => navigate("/register")}
-                  className="bg-primary hover:bg-blue-800 text-white font-semibold py-4 px-8 rounded-lg transition-all shadow-md hover:shadow-lg flex items-center justify-center group"
+                  className="bg-primary hover:bg-blue-800 text-white font-medium py-3 px-6 sm:py-4 sm:px-8 rounded-lg transition-all shadow-md hover:shadow-lg flex items-center justify-center group"
                 >
                   <span>Get Started</span>
                   <svg
@@ -434,17 +431,19 @@ const LandingPage = () => {
                       featuresSection.scrollIntoView({ behavior: "smooth" });
                     }
                   }}
-                  className="bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 font-semibold py-4 px-8 rounded-lg transition-all shadow-sm hover:shadow-md flex items-center justify-center group"
+                  className="bg-white hover:bg-gray-50 text-textSecondary border border-gray-200 font-medium py-3 px-6 sm:py-4 sm:px-8 rounded-lg transition-all shadow-sm hover:shadow-md flex items-center justify-center group"
                 >
                   <span>Learn More</span>
                 </button>
               </div>
 
-
-              <div ref={statsRef} className="grid grid-cols-3 gap-8">
+              <div
+                ref={statsRef}
+                className="grid grid-cols-3 gap-3 sm:gap-5 md:gap-8"
+              >
                 <div>
                   <div className="flex items-baseline">
-                    <span className="text-4xl font-bold text-gray-900">
+                    <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900">
                       {campuses}
                     </span>
                     <span className="text-2xl font-bold text-primary ml-1">
@@ -455,7 +454,7 @@ const LandingPage = () => {
                 </div>
                 <div>
                   <div className="flex items-baseline">
-                    <span className="text-4xl font-bold text-gray-900">
+                    <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900">
                       {users}k
                     </span>
                     <span className="text-2xl font-bold text-primary ml-1">
@@ -466,7 +465,7 @@ const LandingPage = () => {
                 </div>
                 <div>
                   <div className="flex items-baseline">
-                    <span className="text-4xl font-bold text-gray-900">
+                    <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900">
                       {complaints}k
                     </span>
                     <span className="text-2xl font-bold text-primary ml-1">
@@ -480,9 +479,7 @@ const LandingPage = () => {
               </div>
             </div>
 
-
             <div className="relative hidden lg:flex justify-center items-center perspective-1000">
-
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 <div
                   className="w-64 h-8 bg-gray-900/10 rounded-full blur-2xl transform transition-all duration-500"
@@ -539,7 +536,6 @@ const LandingPage = () => {
                   }
                 }}
               >
-
                 <div
                   className="absolute inset-0 z-20 pointer-events-none rounded-[3rem]"
                   style={{
@@ -553,7 +549,6 @@ const LandingPage = () => {
                     overflow: "hidden",
                   }}
                 >
-
                   <div
                     style={{
                       position: "absolute",
@@ -584,7 +579,6 @@ const LandingPage = () => {
                     }}
                   ></div>
                 </div>
-
                 <div className="absolute top-28 -left-2 w-2 h-8 bg-gradient-to-b from-gray-300 to-gray-600 rounded-l-xl shadow-lg opacity-80"></div>{" "}
                 {/* Mute */}
                 <div className="absolute top-44 -left-2 w-2 h-16 bg-gradient-to-b from-gray-200 to-gray-500 rounded-l-xl shadow-lg opacity-80"></div>{" "}
@@ -593,7 +587,6 @@ const LandingPage = () => {
                 {/* Vol Down */}
                 <div className="absolute top-60 -right-2 w-2 h-24 bg-gradient-to-b from-gray-400 to-gray-700 rounded-r-xl shadow-lg opacity-80"></div>{" "}
                 {/* Power */}
-
                 <div className="absolute top-2 left-1/2 -translate-x-1/2 flex flex-col items-center z-30">
                   <div className="w-16 h-4 bg-gradient-to-b from-gray-900 to-black rounded-b-2xl flex items-center justify-center relative shadow-lg">
                     <div className="absolute left-2 top-1 w-2 h-2 bg-gradient-to-br from-blue-200 to-blue-900 rounded-full shadow-inner border border-blue-100"></div>
@@ -601,9 +594,7 @@ const LandingPage = () => {
                   </div>
                   <div className="w-24 h-2 bg-gradient-to-r from-gray-800 to-gray-900 rounded-b-xl mt-0.5 opacity-80"></div>
                 </div>
-
                 <div className="relative w-full h-full bg-black rounded-[2.7rem] border-[12px] border-black overflow-hidden ring-2 ring-white/10 z-30">
-
                   <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-24 h-6 bg-gradient-to-b from-gray-900 to-black rounded-b-xl z-40 flex justify-center items-center shadow-lg">
                     <div className="w-16 h-3 bg-gray-900/80 rounded-full flex items-center justify-end px-1.5 space-x-1.5">
                       <div className="w-1 h-1 bg-blue-900/50 rounded-full"></div>
@@ -620,7 +611,6 @@ const LandingPage = () => {
                     }}
                   ></div>
                   <div className="h-full w-full bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-[2.2rem] overflow-hidden relative">
-
                     <div className="flex justify-between items-center mb-2 text-white text-[10px] pl-6 pr-3 pt-3 font-medium select-none">
                       <span>17:30</span>
                       <div className="flex items-center space-x-1">
@@ -654,7 +644,6 @@ const LandingPage = () => {
                         </div>
                       </div>
                     </div>
-
 
                     <div className="flex items-center justify-between mb-4 px-5">
                       <button className="text-white hover:scale-125 transition-transform duration-200">
@@ -691,7 +680,6 @@ const LandingPage = () => {
                         </svg>
                       </button>
                     </div>
-
 
                     <motion.div
                       className="space-y-2.5 px-3"
@@ -753,30 +741,26 @@ const LandingPage = () => {
         </div>
       </section>
 
-
       <section
         id="features"
-        className="relative py-24 bg-gray-50 overflow-hidden"
+        className="relative py-12 sm:py-16 md:py-24 bg-gray-50 overflow-hidden"
       >
-
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
           <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] rounded-full bg-blue-100/50 blur-3xl"></div>
           <div className="absolute top-[40%] -right-[10%] w-[40%] h-[40%] rounded-full bg-teal-100/50 blur-3xl"></div>
         </div>
 
-        <div className="max-w-[1440px] mx-auto px-6 md:px-8 lg:px-12 relative z-10">
-
-          <div className="text-center mb-20">
-
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12 relative z-10">
+          <div className="text-center mb-10 md:mb-20">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
               viewport={{ once: true }}
             >
-              <h2 className="text-4xl font-bold text-gray-900 mb-4 tracking-tight flex md:flex-row justify-center items-center md:items-baseline gap-2">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-textPrimary mb-4 tracking-tight flex flex-col md:flex-row justify-center items-center md:items-baseline gap-1 md:gap-2">
                 <span>Powerful Features, </span>
-                <span className="relative h-[1.5em] overflow-hidden w-auto text-left">
+                <span className="relative h-[1.8em] overflow-hidden w-auto text-left">
                   <AnimatePresence mode="popLayout">
                     <motion.span
                       key={activePhraseIndex}
@@ -786,7 +770,7 @@ const LandingPage = () => {
                       transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
                       className="absolute top-0 left-0 whitespace-nowrap flex items-start gap-1.5"
                     >
-                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-teal-500 py-2">
+                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-teal-500 py-1 pb-2">
                         {phrases[activePhraseIndex]}
                       </span>
                       {/* Superscript Dot */}
@@ -794,13 +778,13 @@ const LandingPage = () => {
                     </motion.span>
                   </AnimatePresence>
                   {/* Invisible placeholder to maintain width - using largest phrase + dot */}
-                  <span className="opacity-0 pointer-events-none py-2 flex items-start gap-1.5">
+                  <span className="opacity-0 pointer-events-none py-1 pb-2 flex items-start gap-1.5">
                     {phrases[1]}
                     <div className="w-2.5 h-2.5 rounded-full mt-3 flex-shrink-0"></div>
                   </span>
                 </span>
               </h2>
-              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              <p className="text-base sm:text-lg text-textSecondary max-w-2xl mx-auto">
                 Everything you need to manage hostel life efficiently, wrapped
                 in a beautiful experience.
               </p>
@@ -808,8 +792,8 @@ const LandingPage = () => {
           </div>
 
           {/* Diagonal Feature Stack */}
-          <div className="flex flex-col items-center relative py-20">
-            <div className="w-full max-w-6xl relative mx-auto px-6 md:px-8 lg:px-12 flex flex-col lg:flex-row justify-center items-center lg:items-start gap-8 lg:gap-12">
+          <div className="flex flex-col items-center relative py-8 sm:py-12 md:py-20">
+            <div className="w-full max-w-6xl relative mx-auto px-4 sm:px-6 md:px-8 lg:px-12 flex flex-col lg:flex-row justify-center items-center lg:items-start gap-8 lg:gap-12">
               {features.map((feature, index) => (
                 <motion.div
                   key={feature.id}
@@ -829,13 +813,12 @@ const LandingPage = () => {
                   viewport={{ once: true, margin: "-50px" }}
                   style={{
                     position: "relative",
-                    marginTop: index * 60, // Consistent vertical step
                     zIndex: index,
-                    width: "340px",
-                    height: "340px",
                   }}
                   className={`
-                    bg-white flex flex-col justify-between p-8
+                    w-full max-w-[340px] lg:w-[340px] min-h-[280px] lg:h-[340px]
+                    ${index === 1 ? "lg:mt-[60px]" : index === 2 ? "lg:mt-[120px]" : ""}
+                    bg-white flex flex-col justify-between p-6 sm:p-8
                     transition-shadow duration-300 border border-gray-200
                     hover:shadow-xl ${feature.theme.border} ${feature.theme.shadow}
                     group shadow-lg
@@ -862,7 +845,7 @@ const LandingPage = () => {
 
                   {/* Body: Typography */}
                   <div className="flex-1 flex flex-col justify-center relative z-10">
-                    <h3 className="text-3xl font-bold text-gray-900 mb-4 leading-none tracking-tight">
+                    <h3 className="text-2xl sm:text-3xl font-semibold text-textPrimary mb-4 leading-none tracking-tight">
                       {feature.title}
                     </h3>
                     <div className="w-8 h-1 bg-gray-100 mb-4 group-hover:w-16 transition-all duration-500 ease-out"></div>
@@ -898,19 +881,19 @@ const LandingPage = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
-        <div className="max-w-[1440px] mx-auto px-6 md:px-8 lg:px-12">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+      <footer className="bg-gray-900 text-white py-8 sm:py-12">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
             <div>
-              <Logo isDark={true} className="mb-4" />
+              <Logo variant="dark" className="mb-4" />
               <p className="text-gray-400 leading-relaxed">
-                A digital complaint management system designed for hostel
+                A digital complaint management system for streamlined hostel
                 administration and resident communication.
               </p>
             </div>
 
             <div>
-              <h4 className="font-bold text-lg mb-4">Quick Links</h4>
+              <h4 className="font-semibold text-lg mb-4">Quick Links</h4>
               <ul className="space-y-2 text-gray-400">
                 <li>
                   <button
@@ -954,10 +937,13 @@ const LandingPage = () => {
             </div>
 
             <div>
-              <h4 className="font-bold text-lg mb-4">Academic Project</h4>
+              <h4 className="font-semibold text-lg mb-4">
+                Built for Better Hostel Living
+              </h4>
               <p className="text-gray-400 leading-relaxed">
-                This project is developed for academic purposes as part of
-                university coursework.
+                Dwello helps residents report issues easily and stay informed,
+                while enabling hostel teams to resolve problems faster and more
+                transparently.
               </p>
             </div>
           </div>

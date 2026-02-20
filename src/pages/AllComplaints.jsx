@@ -1,29 +1,22 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import {
-  getMyComplaints,
-  getAnnouncements,
-  getImageUrl,
-} from "../api/complaints";
+import { getMyComplaints, getImageUrl } from "../api/complaints";
 
-const StudentDashboard = () => {
+const AllComplaints = () => {
   const navigate = useNavigate();
-  const { user, token, logout } = useAuth();
+  const { token, logout } = useAuth();
   const [complaints, setComplaints] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [selectedComplaint, setSelectedComplaint] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [latestAnnouncement, setLatestAnnouncement] = useState(null);
   const [lightboxImage, setLightboxImage] = useState(null);
+  const [sortOrder, setSortOrder] = useState("newest");
+  const [statusFilter, setStatusFilter] = useState("All");
 
   useEffect(() => {
-    if (!token) {
-      // AuthContext handles initial load, but if no token, redirect happens there or here
-      // user might be null initially
-      return;
-    }
+    if (!token) return;
 
     const loadComplaints = async () => {
       try {
@@ -44,37 +37,8 @@ const StudentDashboard = () => {
       }
     };
 
-    const loadLatestAnnouncement = async () => {
-      try {
-        const data = await getAnnouncements();
-        if (data.success && data.data.length > 0) {
-          setLatestAnnouncement(data.data[0]);
-        }
-      } catch (err) {
-        console.error("Error fetching announcements:", err);
-      }
-    };
-
     loadComplaints();
-    loadLatestAnnouncement();
   }, [token, logout, navigate]);
-
-  const handleViewComplaint = (complaint) => {
-    setSelectedComplaint(complaint);
-    setShowModal(true);
-  };
-
-  const closeModal = () => {
-    setShowModal(false);
-    setSelectedComplaint(null);
-  };
-
-  // Calculate stats
-  const stats = {
-    open: complaints.filter((c) => c.status === "Open").length,
-    inProgress: complaints.filter((c) => c.status === "In Progress").length,
-    resolved: complaints.filter((c) => c.status === "Resolved").length,
-  };
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -127,26 +91,24 @@ const StudentDashboard = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        Loading...
-      </div>
-    );
-  }
-
-  // Recent 5 complaints sorted by date descending
-  const recentComplaints = [...complaints]
-    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-    .slice(0, 5);
-
-  const announcementTagColors = {
-    Urgent: "bg-red-100 text-red-700",
-    Maintenance: "bg-amber-100 text-amber-700",
-    Notice: "bg-blue-100 text-blue-700",
-    Event: "bg-purple-100 text-purple-700",
-    General: "bg-gray-100 text-gray-700",
+  const handleViewComplaint = (complaint) => {
+    setSelectedComplaint(complaint);
+    setShowModal(true);
   };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setSelectedComplaint(null);
+  };
+
+  // Filtered and sorted complaints
+  const filteredComplaints = complaints
+    .filter((c) => statusFilter === "All" || c.status === statusFilter)
+    .sort((a, b) => {
+      const dateA = new Date(a.createdAt);
+      const dateB = new Date(b.createdAt);
+      return sortOrder === "newest" ? dateB - dateA : dateA - dateB;
+    });
 
   if (loading) {
     return (
@@ -164,270 +126,120 @@ const StudentDashboard = () => {
         </div>
       )}
 
-      {/* Stats Cards */}
-      <div className="mb-8">
-        <h2 className="text-2xl font-semibold text-textPrimary mb-6">
-          Complaints Overview
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Open */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-            <div className="flex items-start justify-between mb-2">
-              <div>
-                <p className="text-gray-500 text-sm font-medium mb-1">
-                  Open Complaints
-                </p>
-                <p className="text-4xl font-bold text-gray-900">{stats.open}</p>
-              </div>
-              <div className="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center">
-                <svg
-                  className="w-6 h-6 text-orange-500"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                  />
-                </svg>
-              </div>
-            </div>
-          </div>
-          {/* In Progress */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-            <div className="flex items-start justify-between mb-2">
-              <div>
-                <p className="text-gray-500 text-sm font-medium mb-1">
-                  In Progress
-                </p>
-                <p className="text-4xl font-bold text-gray-900">
-                  {stats.inProgress}
-                </p>
-              </div>
-              <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
-                <svg
-                  className="w-6 h-6 text-blue-500"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-              </div>
-            </div>
-          </div>
-          {/* Resolved */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-            <div className="flex items-start justify-between mb-2">
-              <div>
-                <p className="text-gray-500 text-sm font-medium mb-1">
-                  Resolved
-                </p>
-                <p className="text-4xl font-bold text-gray-900">
-                  {stats.resolved}
-                </p>
-              </div>
-              <div className="w-12 h-12 bg-teal-50 rounded-xl flex items-center justify-center">
-                <svg
-                  className="w-6 h-6 text-teal-500"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-              </div>
-            </div>
-          </div>
+      {/* Header with filters */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <div>
+          <h2 className="text-2xl font-semibold text-textPrimary">
+            All Complaints
+          </h2>
+          <p className="text-sm text-gray-500 mt-1">
+            {filteredComplaints.length} complaint
+            {filteredComplaints.length !== 1 ? "s" : ""}
+          </p>
+        </div>
+        <div className="flex items-center gap-3">
+          {/* Status filter */}
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
+          >
+            <option value="All">All Statuses</option>
+            <option value="Open">Open</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Resolved">Resolved</option>
+            <option value="Rejected">Rejected</option>
+          </select>
+
+          {/* Sort */}
+          <select
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
+          >
+            <option value="newest">Newest first</option>
+            <option value="oldest">Oldest first</option>
+          </select>
         </div>
       </div>
 
-      {/* Two-column layout: Recent Complaints (left) + Recent Announcement (right) */}
-      {/* On mobile: Announcement first, then Complaints */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Recent Announcement — shown first on mobile (order-1 mobile, order-2 desktop) */}
-        <div className="order-1 lg:order-2">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-bold text-gray-900 mb-4">
-              Recent Announcement
-            </h3>
-            {latestAnnouncement ? (
-              <div>
-                <div className="flex items-center gap-2 mb-2">
-                  <span
-                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${
-                      announcementTagColors[latestAnnouncement.tag] ||
-                      announcementTagColors.General
-                    }`}
-                  >
-                    {latestAnnouncement.tag}
-                  </span>
-                </div>
-                <h4 className="text-base font-semibold text-gray-900 mb-2">
-                  {latestAnnouncement.title}
-                </h4>
-                <p className="text-sm text-gray-600 line-clamp-2 mb-3">
-                  {latestAnnouncement.content}
-                </p>
-                <p className="text-xs text-gray-400 mb-4">
-                  {new Date(latestAnnouncement.createdAt).toLocaleDateString(
-                    "en-IN",
-                    { day: "numeric", month: "short", year: "numeric" },
-                  )}
-                </p>
-                <button
-                  onClick={() => navigate("/announcements")}
-                  className="text-primary hover:text-blue-800 text-sm font-medium transition-colors"
-                >
-                  View all announcements &rarr;
-                </button>
-              </div>
-            ) : (
-              <div className="text-center py-4">
-                <svg
-                  className="w-10 h-10 mx-auto mb-2 text-gray-300"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"
-                  />
-                </svg>
-                <p className="text-sm text-gray-400">No announcements yet</p>
-              </div>
-            )}
-          </div>
-
-          {/* Raise Complaint Button */}
-          <button
-            onClick={() => navigate("/raise-complaint")}
-            className="mt-6 w-full bg-primary hover:bg-blue-800 text-white font-semibold py-4 px-6 rounded-xl transition-all shadow-md hover:shadow-lg"
-          >
-            Raise Complaint
-          </button>
-        </div>
-
-        {/* Recent Complaints — primary column */}
-        <div className="lg:col-span-2 order-2 lg:order-1">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-              <h3 className="text-lg font-bold text-gray-900">
-                Recent Complaints
-              </h3>
-              <button
-                onClick={() => navigate("/raise-complaint")}
-                className="bg-primary hover:bg-blue-800 text-white font-medium py-2 px-4 rounded-lg transition-colors text-sm"
+      {/* Complaints table */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+        <div className="overflow-x-auto overflow-y-auto max-h-[700px]">
+          {filteredComplaints.length === 0 ? (
+            <div className="p-12 text-center text-gray-500">
+              <svg
+                className="w-16 h-16 mx-auto mb-4 text-gray-300"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
               >
-                + New Complaint
-              </button>
-            </div>
-            <div className="overflow-x-auto">
-              {complaints.length === 0 ? (
-                <div className="p-8 text-center text-gray-500">
-                  <svg
-                    className="w-16 h-16 mx-auto mb-4 text-gray-300"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                    />
-                  </svg>
-                  <p className="font-medium">No complaints yet</p>
-                  <p className="text-sm mt-1">
-                    Click &ldquo;New Complaint&rdquo; to submit your first
-                    complaint
-                  </p>
-                </div>
-              ) : (
-                <table className="w-full">
-                  <thead className="bg-gray-50 border-b border-gray-200">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                        Title
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                        Status
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                        Date Submitted
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                        Action
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200">
-                    {recentComplaints.map((complaint) => (
-                      <tr
-                        key={complaint._id}
-                        className="hover:bg-gray-50 transition-colors"
-                      >
-                        <td className="px-6 py-4">
-                          <p className="text-sm font-medium text-gray-900">
-                            {complaint.title}
-                          </p>
-                        </td>
-                        <td className="px-6 py-4">
-                          <span
-                            className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full whitespace-nowrap ${getStatusColor(complaint.status)}`}
-                          >
-                            {complaint.status}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4">
-                          <p className="text-sm text-gray-600">
-                            {formatDate(complaint.createdAt)}
-                          </p>
-                        </td>
-                        <td className="px-6 py-4">
-                          <button
-                            onClick={() => handleViewComplaint(complaint)}
-                            id="viewComplaintBtn"
-                            className="text-primary hover:text-blue-800 font-medium text-sm"
-                          >
-                            View
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                />
+              </svg>
+              <p className="font-medium">No complaints found</p>
+              {statusFilter !== "All" && (
+                <p className="text-sm mt-1">Try changing the status filter</p>
               )}
             </div>
-            {/* View all complaints link */}
-            {complaints.length > 0 && (
-              <div className="px-6 py-4 border-t border-gray-200">
-                <button
-                  onClick={() => navigate("/all-complaints")}
-                  className="text-primary hover:text-blue-800 text-sm font-medium transition-colors"
-                >
-                  View all complaints &rarr;
-                </button>
-              </div>
-            )}
-          </div>
+          ) : (
+            <table className="w-full">
+              <thead className="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    Title
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    Date Submitted
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    Action
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {filteredComplaints.map((complaint) => (
+                  <tr
+                    key={complaint._id}
+                    className="hover:bg-gray-50 transition-colors"
+                  >
+                    <td className="px-6 py-4">
+                      <p className="text-sm font-medium text-gray-900">
+                        {complaint.title}
+                      </p>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span
+                        className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full whitespace-nowrap ${getStatusColor(complaint.status)}`}
+                      >
+                        {complaint.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <p className="text-sm text-gray-600">
+                        {formatDate(complaint.createdAt)}
+                      </p>
+                    </td>
+                    <td className="px-6 py-4">
+                      <button
+                        onClick={() => handleViewComplaint(complaint)}
+                        className="text-primary hover:text-blue-800 font-medium text-sm"
+                      >
+                        View
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
 
@@ -435,7 +247,6 @@ const StudentDashboard = () => {
       {showModal && selectedComplaint && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-auto">
-            {/* Modal Header */}
             <div className="sticky top-0 bg-white border-b border-gray-200 px-4 sm:px-6 py-4 flex justify-between items-center">
               <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
                 Complaint Details
@@ -460,9 +271,7 @@ const StudentDashboard = () => {
               </button>
             </div>
 
-            {/* Modal Content */}
             <div className="p-4 sm:p-6 space-y-6">
-              {/* Title */}
               <div>
                 <label className="block text-sm font-semibold text-gray-600 mb-2">
                   Title
@@ -472,7 +281,6 @@ const StudentDashboard = () => {
                 </p>
               </div>
 
-              {/* Description */}
               <div>
                 <label className="block text-sm font-semibold text-gray-600 mb-2">
                   Description
@@ -482,7 +290,6 @@ const StudentDashboard = () => {
                 </p>
               </div>
 
-              {/* Current Status */}
               <div>
                 <label className="block text-sm font-semibold text-gray-600 mb-2">
                   Current Status
@@ -518,7 +325,6 @@ const StudentDashboard = () => {
                   </div>
                 )}
 
-              {/* Status Timeline */}
               {selectedComplaint.statusHistory &&
                 selectedComplaint.statusHistory.length > 0 && (
                   <div>
@@ -526,7 +332,6 @@ const StudentDashboard = () => {
                       Status Timeline
                     </label>
                     <div className="relative pl-6 space-y-4">
-                      {/* Timeline line */}
                       <div className="absolute left-[9px] top-1 bottom-1 w-0.5 bg-gray-200"></div>
                       {selectedComplaint.statusHistory.map((entry, idx) => (
                         <div key={idx} className="relative flex items-start">
@@ -641,7 +446,6 @@ const StudentDashboard = () => {
                 )}
               </div>
 
-              {/* Date Submitted */}
               <div>
                 <label className="block text-sm font-semibold text-gray-600 mb-2">
                   Date Submitted
@@ -652,7 +456,6 @@ const StudentDashboard = () => {
               </div>
             </div>
 
-            {/* Modal Footer */}
             <div className="sticky bottom-0 bg-gray-50 border-t border-gray-200 px-4 sm:px-6 py-4">
               <button
                 onClick={closeModal}
@@ -701,4 +504,4 @@ const StudentDashboard = () => {
   );
 };
 
-export default StudentDashboard;
+export default AllComplaints;
