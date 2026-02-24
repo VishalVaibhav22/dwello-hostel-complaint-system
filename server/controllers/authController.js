@@ -22,14 +22,68 @@ exports.register = async (req, res) => {
       rollNumber,
     } = req.body;
 
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res
-        .status(400)
-        .json({ message: "User with this email already exists" });
+    // ==========================
+    // ✅ EXPERIMENT-5 PASSWORD VALIDATION
+    // ==========================
+
+    if (!password) {
+      return res.status(400).json({
+        message: "Password is required.",
+      });
     }
 
-    // Roll number validation for Thapar University students
+    if (password.length < 8 || password.length > 15) {
+      return res.status(400).json({
+        message: "Password must be between 8 and 15 characters long.",
+      });
+    }
+
+    if (/\s/.test(password)) {
+      return res.status(400).json({
+        message: "Password must not contain whitespace.",
+      });
+    }
+
+    if (!/[A-Z]/.test(password)) {
+      return res.status(400).json({
+        message: "Password must contain at least one uppercase letter.",
+      });
+    }
+
+    if (!/[a-z]/.test(password)) {
+      return res.status(400).json({
+        message: "Password must contain at least one lowercase letter.",
+      });
+    }
+
+    if (!/\d/.test(password)) {
+      return res.status(400).json({
+        message: "Password must contain at least one digit.",
+      });
+    }
+
+    if (!/[!@#$%&*()\-\+=^]/.test(password)) {
+      return res.status(400).json({
+        message:
+          "Password must contain at least one special character (!@#$%&*()-+=^).",
+      });
+    }
+
+    // ==========================
+    // CHECK IF USER EXISTS
+    // ==========================
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({
+        message: "User with this email already exists",
+      });
+    }
+
+    // ==========================
+    // ROLL NUMBER VALIDATION (Thapar Only)
+    // ==========================
+
     if (university === "Thapar Institute of Engineering and Technology") {
       if (!rollNumber) {
         return res.status(400).json({
@@ -37,21 +91,23 @@ exports.register = async (req, res) => {
         });
       }
 
-      // Validate format: exactly 9 digits
       if (!/^\d{9}$/.test(rollNumber)) {
-        return res
-          .status(400)
-          .json({ message: "Roll number must be exactly 9 digits" });
+        return res.status(400).json({
+          message: "Roll number must be exactly 9 digits",
+        });
       }
 
-      // Check uniqueness
       const existingRollNumber = await User.findOne({ rollNumber });
       if (existingRollNumber) {
-        return res
-          .status(400)
-          .json({ message: "This roll number is already registered." });
+        return res.status(400).json({
+          message: "This roll number is already registered.",
+        });
       }
     }
+
+    // ==========================
+    // CREATE USER
+    // ==========================
 
     const user = new User({
       university,
@@ -66,10 +122,18 @@ exports.register = async (req, res) => {
 
     await user.save();
 
+    // ==========================
+    // GENERATE TOKEN
+    // ==========================
+
     const token = jwt.sign(
-      { userId: user._id, email: user.email, role: user.role },
+      {
+        userId: user._id,
+        email: user.email,
+        role: user.role,
+      },
       process.env.JWT_SECRET,
-      { expiresIn: "7d" },
+      { expiresIn: "7d" }
     );
 
     res.status(201).json({
@@ -88,7 +152,9 @@ exports.register = async (req, res) => {
     });
   } catch (error) {
     console.error("Registration error:", error);
-    res.status(500).json({ message: "Server error during registration" });
+    res.status(500).json({
+      message: "Server error during registration",
+    });
   }
 };
 
@@ -106,18 +172,26 @@ exports.login = async (req, res) => {
 
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(401).json({ message: "Invalid email or password" });
+      return res.status(401).json({
+        message: "Invalid email or password",
+      });
     }
 
     const isPasswordValid = await user.comparePassword(password);
     if (!isPasswordValid) {
-      return res.status(401).json({ message: "Invalid email or password" });
+      return res.status(401).json({
+        message: "Invalid email or password",
+      });
     }
 
     const token = jwt.sign(
-      { userId: user._id, email: user.email, role: user.role },
+      {
+        userId: user._id,
+        email: user.email,
+        role: user.role,
+      },
       process.env.JWT_SECRET,
-      { expiresIn: "7d" },
+      { expiresIn: "7d" }
     );
 
     res.status(200).json({
@@ -135,6 +209,8 @@ exports.login = async (req, res) => {
     });
   } catch (error) {
     console.error("Login error:", error);
-    res.status(500).json({ message: "Server error during login" });
+    res.status(500).json({
+      message: "Server error during login",
+    });
   }
 };
