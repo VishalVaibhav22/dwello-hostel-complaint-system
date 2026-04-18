@@ -161,6 +161,21 @@ const AdminAllComplaints = () => {
     }
   };
 
+  const getPriorityColor = (priority) => {
+    switch (priority) {
+      case "Critical":
+        return "bg-red-100 text-red-700";
+      case "High":
+        return "bg-orange-100 text-orange-700";
+      case "Medium":
+        return "bg-yellow-100 text-yellow-700";
+      case "Low":
+        return "bg-green-100 text-green-700";
+      default:
+        return "bg-gray-100 text-gray-700";
+    }
+  };
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("en-US", {
@@ -185,12 +200,14 @@ const AdminAllComplaints = () => {
           ?.toLowerCase()
           .includes(query);
         const categoryMatch = c.category?.toLowerCase().includes(query);
+        const priorityMatch = c.priority?.toLowerCase().includes(query);
         if (
           !titleMatch &&
           !studentNameMatch &&
           !studentEmailMatch &&
           !rollNumberMatch &&
-          !categoryMatch
+          !categoryMatch &&
+          !priorityMatch
         )
           return false;
       }
@@ -386,6 +403,9 @@ const AdminAllComplaints = () => {
                     Category
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    Priority
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     Status
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
@@ -424,6 +444,13 @@ const AdminAllComplaints = () => {
                     <td className="px-6 py-4">
                       <span className="inline-flex px-2.5 py-1 text-xs font-semibold rounded-full bg-indigo-100 text-indigo-700 whitespace-nowrap">
                         {complaint.category || "Other"}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span
+                        className={`inline-flex px-2.5 py-1 text-xs font-semibold rounded-full whitespace-nowrap ${getPriorityColor(complaint.priority || "Medium")}`}
+                      >
+                        {complaint.priority || "Medium"}
                       </span>
                     </td>
                     <td className="px-6 py-4">
@@ -563,6 +590,16 @@ const AdminAllComplaints = () => {
                   <p className="text-gray-900">
                     {selectedComplaint.category || "Other"}
                   </p>
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-600 mb-2">
+                    Priority
+                  </label>
+                  <span
+                    className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full whitespace-nowrap ${getPriorityColor(selectedComplaint.priority || "Medium")}`}
+                  >
+                    {selectedComplaint.priority || "Medium"}
+                  </span>
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-600 mb-2">

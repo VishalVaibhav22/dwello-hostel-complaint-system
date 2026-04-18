@@ -11,7 +11,7 @@ exports.getHealth = (req, res) => {
 exports.getAnalytics = async (req, res) => {
   try {
     const complaints = await Complaint.find().select(
-      "status category createdAt updatedAt statusHistory",
+      "status category priority createdAt updatedAt statusHistory",
     );
 
     const categories = [
@@ -118,6 +118,27 @@ exports.getAnalytics = async (req, res) => {
       return acc;
     }, {});
 
+    const priorities = ["Low", "Medium", "High", "Critical"];
+    const priorityCounts = priorities.reduce((acc, priority) => {
+      acc[priority] = complaints.filter(
+        (c) => (c.priority || "Medium") === priority,
+      ).length;
+      return acc;
+    }, {});
+
+    const priorityDistribution = priorities.reduce((acc, priority) => {
+      acc[priority] =
+        total > 0 ? Math.round((priorityCounts[priority] / total) * 100) : 0;
+      return acc;
+    }, {});
+
+    const mostFrequentPriority =
+      priorities.reduce(
+        (top, priority) =>
+          priorityCounts[priority] > priorityCounts[top] ? priority : top,
+        "Medium",
+      ) || "Medium";
+
     const mostFrequentCategory =
       categories.reduce(
         (top, category) =>
@@ -137,6 +158,11 @@ exports.getAnalytics = async (req, res) => {
           counts: categoryCounts,
           distribution: categoryDistribution,
           mostFrequentCategory,
+        },
+        priorityAnalytics: {
+          counts: priorityCounts,
+          distribution: priorityDistribution,
+          mostFrequentPriority,
         },
       },
     });
@@ -160,6 +186,7 @@ exports.getAllComplaints = async (req, res) => {
       title: complaint.title,
       description: complaint.description,
       category: complaint.category || "Other",
+      priority: complaint.priority || "Medium",
       status: complaint.status,
       hostel: complaint.hostel,
       roomNumber: complaint.roomNumber,

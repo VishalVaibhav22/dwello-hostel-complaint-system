@@ -1,6 +1,6 @@
-# Dwello - Hostel Complaint Management System with AI-based Automatic Categorization
+# Dwello - Hostel Complaint Management System with AI-based Complaint Categorization and Priority Prediction
 
-Dwello is a full-stack web application designed for hostel residents to report issues and for administrators to manage and resolve them efficiently. The system includes an AI feature that automatically categorizes complaints based on their description, helping administrators organize and handle issues more effectively.
+Dwello is a full-stack web application designed for hostel residents to report issues and for administrators to manage and resolve them efficiently. The system includes AI features that automatically categorize complaints and determine their priority based on the complaint description, helping administrators organize and respond to issues more effectively.
 
 ---
 
@@ -10,6 +10,7 @@ Dwello is a full-stack web application designed for hostel residents to report i
 
 - Submit complaints with title, description, images (up to 3), and availability slots
 - Complaint category is automatically assigned using AI
+- Complaint priority is automatically determined based on urgency
 - Track complaint status through stages: Open -> In Progress -> Resolved
 - View rejection reasons if a complaint is declined
 - Receive notifications when complaint status changes
@@ -20,6 +21,7 @@ Dwello is a full-stack web application designed for hostel residents to report i
 - Dashboard showing complaint overview and quick updates
 - All complaints page with search, filter, and sorting
 - View complaint category assigned automatically
+- View complaint priority level (Low, Medium, High, Critical)
 - Analytics dashboard with charts and statistics
 - Manage registered students
 - Create and manage hostel announcements
@@ -35,11 +37,11 @@ Dwello is a full-stack web application designed for hostel residents to report i
 
 ---
 
-## AI Feature
+## AI Features
 
-### Automatic Complaint Categorization
+### 1. Automatic Complaint Categorization
 
-The system includes an AI component that analyzes complaint text and assigns a category automatically. This reduces manual effort and helps administrators quickly identify the type of issue.
+The system uses a machine learning model to analyze complaint text and assign a category automatically. This reduces manual effort and helps administrators quickly identify the type of issue.
 
 Categories used:
 
@@ -58,7 +60,26 @@ Workflow:
 3. Category is assigned automatically
 4. Complaint stored in database
 5. Admin views categorized complaint
-6. Analytics dashboard updates
+
+---
+
+### 2. Complaint Priority Prediction
+
+The system uses a Large Language Model (Google Gemini API) to determine the urgency level of each complaint based on its description.
+
+Priority levels:
+
+- Low
+- Medium
+- High
+- Critical
+
+Example:
+
+"WiFi not working before exam tomorrow" -> High  
+"Electric spark from switch" -> Critical
+
+If the Gemini priority service is unavailable, the system safely assigns a default priority of Medium.
 
 ---
 
@@ -94,12 +115,20 @@ Workflow:
 
 - Multer + ImageKit (server-side upload)
 
-### AI Component
+### AI Components
+
+Complaint Categorization:
 
 - Python
 - Flask
 - scikit-learn
 - joblib
+- Support Vector Machine (SVM)
+
+Priority Prediction:
+
+- Google Gemini API
+- Node.js integration
 
 ---
 
@@ -112,25 +141,30 @@ Client (React + Vite)
 	v
 Backend API (Node.js + Express)
 	|
-	| Read/Write operations
-	v
-Database (MongoDB)
+   ┌────┴──────────────┐
+   v                   v
+Database (MongoDB)   ImageKit (Images)
 	^
 	|
 	| Complaint text for prediction
 	v
-AI Service (Flask + ML Model)
+Categorization Service (Flask)
+
+	|
+	| Urgency analysis
+	v
+Gemini API (Priority Prediction)
 ```
 
 ### Architecture Notes
 
-- Frontend handles user interface, forms, and role-based pages for students and admins.
-- Backend manages authentication, complaint workflow, notifications, and business logic.
-- MongoDB stores users, complaints, categories, announcements, and related data.
-- AI service analyzes complaint text and predicts the complaint category.
-- Backend saves the predicted category along with the complaint in the database.
-- Complaint images are uploaded to ImageKit from backend and only image URLs are stored in MongoDB.
-- If the AI service is unavailable, the backend assigns the Other category as a safe fallback.
+- Frontend: role-based UI for students and admins.
+- Backend: auth, complaint workflow, and notifications.
+- MongoDB: users, complaints, announcements, and metadata.
+- Categorization service: predicts complaint category.
+- Gemini: predicts complaint priority.
+- ImageKit: stores complaint images as hosted URLs.
+- Fallbacks: category `Other`, priority `Medium`.
 
 ---
 
@@ -153,8 +187,8 @@ Model file:
 Clone the repository:
 
 ```bash
-git clone https://github.com/VishalVaibhav22/dwello-ai-hostel-complaint-system.git
-cd dwello-ai-hostel-complaint-system
+git clone https://github.com/VishalVaibhav22/dwello-hostel-complaint-system.git
+cd dwello-hostel-complaint-system
 ```
 
 Install frontend dependencies:
@@ -186,6 +220,11 @@ AI_SERVICE_URL=http://localhost:8000/predict
 IMAGEKIT_PUBLIC_KEY=your_imagekit_public_key
 IMAGEKIT_PRIVATE_KEY=your_imagekit_private_key
 IMAGEKIT_URL_ENDPOINT=https://ik.imagekit.io/your_imagekit_id
+
+# Gemini API
+GEMINI_API_KEY=your_gemini_api_key
+GEMINI_DEFAULT_PRIORITY=Medium
+GEMINI_MAX_INPUT_LENGTH=3000
 ```
 
 Install AI dependencies:
@@ -198,11 +237,11 @@ pip install flask joblib scikit-learn
 
 ## Run the Application
 
-Terminal 1 - Start AI service:
+Terminal 1 - Start categorization service:
 
 ```bash
 cd ai
-python ai_service.py
+python categorization_service.py
 ```
 
 Terminal 2 - Start backend:
@@ -222,7 +261,7 @@ Application URLs:
 
 - Frontend: http://localhost:5173
 - Backend: http://localhost:5000
-- AI service: http://localhost:8000
+- Categorization service: http://localhost:8000
 
 ---
 
@@ -231,7 +270,7 @@ Application URLs:
 ```text
 hostel-complaint-management/
 ├── ai/
-│   ├── ai_service.py
+│   ├── categorization_service.py
 │   ├── complaint_classifier.pkl
 │   ├── hostel_complaints.csv
 │   └── requirements.txt
@@ -263,7 +302,7 @@ hostel-complaint-management/
 
 - Email notifications
 - Forgot password functionality
-- Complaint priority prediction
+- Complaint trend analytics
 - Mobile application support
 
 ---

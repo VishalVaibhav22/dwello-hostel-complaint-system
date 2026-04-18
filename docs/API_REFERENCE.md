@@ -4,6 +4,13 @@ Base URL: `http://localhost:5000`
 
 All authenticated endpoints require: `Authorization: Bearer <token>`
 
+Priority levels used across the API:
+
+- `Low`
+- `Medium`
+- `High`
+- `Critical`
+
 ---
 
 ## Authentication
@@ -68,6 +75,8 @@ All authenticated endpoints require: `Authorization: Bearer <token>`
   - Complaint images are uploaded to ImageKit by the backend.
   - `images` stored in MongoDB are public ImageKit URL strings (not local server file paths).
   - For multipart requests, do not force `Content-Type: application/json`.
+  - Category is predicted via local categorization service (`AI_SERVICE_URL`) with fallback `Other`.
+  - Priority is predicted via Gemini (`gemini-2.5-flash`) with fallback `Medium`.
 - **Success Response (201)**:
   ```json
   {
@@ -78,6 +87,7 @@ All authenticated endpoints require: `Authorization: Bearer <token>`
       "title": "Water leakage in bathroom",
       "description": "Tap keeps dripping all day",
       "category": "Plumbing",
+      "priority": "Medium",
       "status": "Open",
       "images": [
         "https://ik.imagekit.io/your_imagekit_id/complaints/.../photo1.jpg"
@@ -97,6 +107,13 @@ All authenticated endpoints require: `Authorization: Bearer <token>`
   - `500` image uploads not configured (missing ImageKit env)
   - `502` ImageKit upload failed
 
+### Priority Prediction Runtime Behavior
+
+- The backend sanitizes complaint text before sending it to Gemini.
+- The backend accepts only valid enum output (`Low|Medium|High|Critical`).
+- Any invalid/empty model output is normalized to fallback priority (`Medium` by default, configurable via env).
+- Complaint creation is never blocked by priority inference failure.
+
 ---
 
 ## Admin
@@ -110,12 +127,40 @@ All authenticated endpoints require: `Authorization: Bearer <token>`
 
 - **GET** `/api/admin/analytics`
 - **Access**: Admin
-- **Returns**: Status distribution, average resolution time, response rate, daily/weekly trends.
+- **Returns**:
+  - status distribution
+  - average resolution time
+  - response rate
+  - daily/weekly trends
+  - category analytics
+  - priority analytics
+
+- **Priority analytics payload shape**:
+  ```json
+  {
+    "priorityAnalytics": {
+      "counts": {
+        "Low": 2,
+        "Medium": 14,
+        "High": 8,
+        "Critical": 1
+      },
+      "distribution": {
+        "Low": 8,
+        "Medium": 56,
+        "High": 32,
+        "Critical": 4
+      },
+      "mostFrequentPriority": "Medium"
+    }
+  }
+  ```
 
 ### Get All Complaints
 
 - **GET** `/api/admin/complaints`
 - **Access**: Admin
+- **Complaint fields include**: `category`, `priority`, `status`, student metadata, media URLs, timeline metadata.
 
 ### Update Complaint Status
 

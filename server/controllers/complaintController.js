@@ -8,6 +8,10 @@ const {
   isImageKitConfigured,
   missingImageKitEnv,
 } = require("../utils/imagekit");
+const {
+  DEFAULT_PRIORITY,
+  predictComplaintPriority,
+} = require("../utils/geminiPriority");
 
 const VALID_CATEGORIES = [
   "Electrical",
@@ -148,7 +152,10 @@ exports.createComplaint = async (req, res) => {
     // Predict category via AI service. Never fail complaint creation on AI errors.
     let category = "Other";
     try {
-      const complaintText = `${title}. ${description}`;
+      const complaintText = [title, description]
+        .map((text) => String(text || "").trim())
+        .filter(Boolean)
+        .join(". ");
       const aiResponse = await axios.post(
         AI_SERVICE_URL,
         { text: complaintText },
@@ -164,10 +171,27 @@ exports.createComplaint = async (req, res) => {
       category = "Other";
     }
 
+    // Predict priority via Gemini API. Never fail complaint creation on AI errors.
+    let priority = DEFAULT_PRIORITY;
+    try {
+      const complaintText = [title, description]
+        .map((text) => String(text || "").trim())
+        .filter(Boolean)
+        .join(". ");
+      priority = await predictComplaintPriority(complaintText);
+    } catch (priorityError) {
+      console.error(
+        "AI priority prediction failed:",
+        priorityError?.message || priorityError,
+      );
+      priority = DEFAULT_PRIORITY;
+    }
+
     const complaint = new Complaint({
       title,
       description,
       category,
+      priority,
       userId: req.user._id,
       userName: req.user.fullName,
       userEmail: req.user.email,

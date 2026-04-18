@@ -4,17 +4,23 @@
 
 Dwello is a full-stack hostel complaint management system built with the **MERN stack** (MongoDB, Express.js, React, Node.js). The backend follows the **MVC pattern**, and the frontend uses a component-based architecture with React Router for navigation.
 
+The complaint ingestion pipeline uses two AI stages:
+
+- Local ML service for category prediction.
+- Gemini inference for priority prediction.
+
 ## Tech Stack
 
-| Layer       | Technology                                           |
-| ----------- | ---------------------------------------------------- |
-| Frontend    | React 18, Vite, Tailwind CSS                         |
-| Backend     | Express.js, Node.js                                  |
-| Database    | MongoDB with Mongoose ODM                            |
-| Auth        | JWT (JSON Web Tokens), bcryptjs                      |
-| File Upload | Multer (memory parsing) + ImageKit (CDN URL storage) |
-| AI Service  | Flask + scikit-learn (category prediction)           |
-| Validation  | express-validator                                    |
+| Layer                  | Technology                                           |
+| ---------------------- | ---------------------------------------------------- |
+| Frontend               | React 18, Vite, Tailwind CSS                         |
+| Backend                | Express.js, Node.js                                  |
+| Database               | MongoDB with Mongoose ODM                            |
+| Auth                   | JWT (JSON Web Tokens), bcryptjs                      |
+| File Upload            | Multer (memory parsing) + ImageKit (CDN URL storage) |
+| Categorization Service | Flask + scikit-learn (category prediction)           |
+| AI Inference           | Google Gemini (`gemini-2.5-flash`) for priority      |
+| Validation             | express-validator                                    |
 
 ## Directory Structure
 
@@ -25,10 +31,11 @@ Dwello is a full-stack hostel complaint management system built with the **MERN 
 │   ├── models/             # Mongoose schemas (User, Complaint, Notification, Announcement)
 │   ├── routes/             # Express route definitions
 │   ├── utils/              # Admin seeder, ImageKit integration utilities
+│   │                        # Gemini priority utility
 │   └── server.js           # App entry point, DB connection, middleware setup
 │
 ├── ai/                     # Flask service for complaint category prediction
-│   ├── ai_service.py
+│   ├── categorization_service.py
 │   └── requirements.txt
 │
 ├── src/
@@ -53,7 +60,7 @@ Dwello is a full-stack hostel complaint management system built with the **MERN 
 ## Data Model
 
 - **User**: Students and admins in a single collection. Students have university, hostel, room number, and optional roll number.
-- **Complaint**: Linked to a user via `userId`. Tracks status history, images, availability slots, and rejection details.
+- **Complaint**: Linked to a user via `userId`. Tracks status history, images, availability slots, rejection details, AI category, and AI priority.
 - **Notification**: Created automatically on complaint status changes. Linked to the affected user.
 - **Announcement**: Admin-created messages with per-user seen tracking.
 
@@ -62,9 +69,10 @@ Dwello is a full-stack hostel complaint management system built with the **MERN 
 1. Student submits complaint text, metadata, and optional images as multipart form data.
 2. Backend parses files in memory using Multer.
 3. Backend uploads image buffers to ImageKit and receives hosted URLs.
-4. Complaint is categorized by the AI service (fallback: `Other` if unavailable).
-5. Backend stores the complaint in MongoDB with ImageKit URL list in `images`.
-6. Frontend renders complaint images directly from stored URLs.
+4. Backend predicts category via Flask categorization service (fallback: `Other` if unavailable).
+5. Backend predicts priority via Gemini (fallback: `Medium` on failure or invalid output).
+6. Backend stores complaint, category, priority, and ImageKit URLs in MongoDB.
+7. Frontend renders complaint images directly from stored URLs and surfaces priority in admin views.
 
 ## Key Design Decisions
 
@@ -72,3 +80,4 @@ Dwello is a full-stack hostel complaint management system built with the **MERN 
 - **External media storage** - complaint images are uploaded to ImageKit; MongoDB stores only image URLs (no local disk persistence).
 - **Role-based access** - a single `role` field on the User model (`student` | `admin`) drives all authorization logic.
 - **Status transitions** - complaint status follows a strict flow: Open → In Progress → Resolved, with a separate rejection path.
+- **Inference resilience** - complaint creation is not blocked by AI outages; category and priority both have deterministic fallback values.

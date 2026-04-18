@@ -283,6 +283,21 @@ const AdminDashboard = () => {
     }
   };
 
+  const getPriorityColor = (priority) => {
+    switch (priority) {
+      case "Critical":
+        return "bg-red-100 text-red-700";
+      case "High":
+        return "bg-orange-100 text-orange-700";
+      case "Medium":
+        return "bg-yellow-100 text-yellow-700";
+      case "Low":
+        return "bg-green-100 text-green-700";
+      default:
+        return "bg-gray-100 text-gray-700";
+    }
+  };
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("en-US", {
@@ -1118,8 +1133,26 @@ const AdminDashboard = () => {
                 </div>
               )}
 
-              {/* Location Info */}
+              {/* Complaint Meta */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-600 mb-2">
+                    Category
+                  </label>
+                  <p className="text-gray-900">
+                    {selectedComplaint.category || "Other"}
+                  </p>
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-600 mb-2">
+                    Priority
+                  </label>
+                  <span
+                    className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full whitespace-nowrap ${getPriorityColor(selectedComplaint.priority || "Medium")}`}
+                  >
+                    {selectedComplaint.priority || "Medium"}
+                  </span>
+                </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-600 mb-2">
                     Hostel / Room
@@ -1158,16 +1191,6 @@ const AdminDashboard = () => {
                 <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
                   {selectedComplaint.description}
                 </p>
-              </div>
-
-              {/* Category */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-600 mb-2">
-                  Category
-                </label>
-                <span className="inline-flex px-3 py-1 text-xs font-semibold rounded-full bg-indigo-100 text-indigo-700 whitespace-nowrap">
-                  {selectedComplaint.category || "Other"}
-                </span>
               </div>
 
               {/* Attached Images */}
