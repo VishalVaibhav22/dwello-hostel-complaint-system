@@ -16,7 +16,7 @@ router.get("/my", authMiddleware, complaintController.getMyComplaints);
 router.get("/:id", authMiddleware, complaintController.getComplaintById);
 
 // @route   POST /api/complaints
-// @desc    Create a new complaint (with optional images)
+// @desc    Create a new complaint (with optional images and auto category)
 // @access  Private
 router.post(
   "/",

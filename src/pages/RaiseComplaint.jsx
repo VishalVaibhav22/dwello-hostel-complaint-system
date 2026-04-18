@@ -9,7 +9,7 @@ const ALLOWED_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
 
 const RaiseComplaint = () => {
   const navigate = useNavigate();
-  const { token, logout } = useAuth();
+  const { token, user, logout } = useAuth();
   const fileInputRef = useRef(null);
   const [formData, setFormData] = useState({
     title: "",
@@ -86,7 +86,7 @@ const RaiseComplaint = () => {
     const validFiles = toAdd.filter((file) => {
       if (!ALLOWED_TYPES.includes(file.type)) {
         imageErrors.push(
-          `"${file.name}" — unsupported type. Use JPG, PNG or WEBP.`,
+          `"${file.name}" - unsupported type. Use JPG, PNG or WEBP.`,
         );
         return false;
       }
@@ -170,6 +170,8 @@ const RaiseComplaint = () => {
         {
           title: formData.title.trim(),
           description: formData.description.trim(),
+          hostel: user?.hostel,
+          roomNumber: user?.roomNumber,
         },
         imageFiles,
         availabilitySlots,
@@ -356,7 +358,7 @@ const RaiseComplaint = () => {
                 <p className="mt-2 text-sm text-red-500">{errors.images}</p>
               )}
               <p className="mt-1 text-xs text-gray-400">
-                JPG, PNG or WEBP — max 5 MB each
+                JPG, PNG or WEBP - max 5 MB each
               </p>
             </div>
 

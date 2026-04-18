@@ -258,7 +258,7 @@ const StudentDashboard = () => {
       {/* Two-column layout: Recent Complaints (left) + Recent Announcement (right) */}
       {/* On mobile: Announcement first, then Complaints */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Recent Announcement — shown first on mobile (order-1 mobile, order-2 desktop) */}
+        {/* Recent Announcement - shown first on mobile (order-1 mobile, order-2 desktop) */}
         <div className="order-1 lg:order-2">
           <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
             <h3 className="text-lg font-bold text-gray-900 mb-4">
@@ -324,7 +324,7 @@ const StudentDashboard = () => {
           </button>
         </div>
 
-        {/* Recent Complaints — primary column */}
+        {/* Recent Complaints - primary column */}
         <div className="lg:col-span-2 order-2 lg:order-1">
           <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
@@ -482,6 +482,16 @@ const StudentDashboard = () => {
                 </p>
               </div>
 
+              {/* Category */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-600 mb-2">
+                  Category
+                </label>
+                <span className="inline-flex px-3 py-1 text-xs font-semibold rounded-full bg-indigo-100 text-indigo-700 whitespace-nowrap">
+                  {selectedComplaint.category || "Other"}
+                </span>
+              </div>
+
               {/* Current Status */}
               <div>
                 <label className="block text-sm font-semibold text-gray-600 mb-2">
@@ -559,8 +569,7 @@ const StudentDashboard = () => {
                   <div className="flex flex-wrap gap-3">
                     {selectedComplaint.images.map((filename, idx) => {
                       const url = getImageUrl(filename);
-                      const authToken = localStorage.getItem("token");
-                      const authUrl = `${url}?token=${authToken}`;
+                      const authUrl = url;
                       return (
                         <button
                           key={idx}
@@ -629,7 +638,7 @@ const StudentDashboard = () => {
                         </span>
                         <span className="text-gray-400">&bull;</span>
                         <span className="text-gray-700">
-                          {slot.startTime} – {slot.endTime}
+                          {slot.startTime} - {slot.endTime}
                         </span>
                       </div>
                     ))}

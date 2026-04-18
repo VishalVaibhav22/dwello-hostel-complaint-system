@@ -194,6 +194,9 @@ const AllComplaints = () => {
                     Title
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    Category
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     Status
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
@@ -214,6 +217,11 @@ const AllComplaints = () => {
                       <p className="text-sm font-medium text-gray-900">
                         {complaint.title}
                       </p>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="inline-flex px-2.5 py-1 text-xs font-semibold rounded-full bg-indigo-100 text-indigo-700 whitespace-nowrap">
+                        {complaint.category || "Other"}
+                      </span>
                     </td>
                     <td className="px-6 py-4">
                       <span
@@ -292,6 +300,15 @@ const AllComplaints = () => {
 
               <div>
                 <label className="block text-sm font-semibold text-gray-600 mb-2">
+                  Category
+                </label>
+                <span className="inline-flex px-3 py-1 text-xs font-semibold rounded-full bg-indigo-100 text-indigo-700 whitespace-nowrap">
+                  {selectedComplaint.category || "Other"}
+                </span>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-600 mb-2">
                   Current Status
                 </label>
                 <span
@@ -364,8 +381,7 @@ const AllComplaints = () => {
                   <div className="flex flex-wrap gap-3">
                     {selectedComplaint.images.map((filename, idx) => {
                       const url = getImageUrl(filename);
-                      const authToken = localStorage.getItem("token");
-                      const authUrl = `${url}?token=${authToken}`;
+                      const authUrl = url;
                       return (
                         <button
                           key={idx}
@@ -434,7 +450,7 @@ const AllComplaints = () => {
                         </span>
                         <span className="text-gray-400">&bull;</span>
                         <span className="text-gray-700">
-                          {slot.startTime} – {slot.endTime}
+                          {slot.startTime} - {slot.endTime}
                         </span>
                       </div>
                     ))}

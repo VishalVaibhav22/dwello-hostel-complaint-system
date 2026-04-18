@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { ROLES } from "../utils/constants";
 import {
   getNotifications,
   markNotificationRead,
@@ -12,7 +13,22 @@ import Logo from "../components/Logo";
 const StudentLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, logout } = useAuth();
+  const { user, token, loading, logout } = useAuth();
+
+  useEffect(() => {
+    if (loading) {
+      return;
+    }
+
+    if (!token || !user) {
+      navigate("/login");
+      return;
+    }
+
+    if (user.role !== ROLES.STUDENT) {
+      navigate("/admin/dashboard");
+    }
+  }, [loading, token, user, navigate]);
 
   // Mobile/tablet: slide-down panel
   const [isOpen, setIsOpen] = useState(false);
@@ -368,7 +384,7 @@ const StudentLayout = () => {
         {/* Header */}
         <header className="bg-white border-b border-gray-200 px-4 md:px-8 h-12 sticky top-0 z-10 flex items-center justify-between">
           <div className="flex items-center">
-            {/* Hamburger — visible only < lg */}
+            {/* Hamburger - visible only < lg */}
             <button
               onClick={() => setIsOpen(!isOpen)}
               className="mr-3 lg:hidden text-gray-600 hover:text-gray-900 relative w-5 h-5"

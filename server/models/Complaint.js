@@ -13,6 +13,19 @@ const complaintSchema = new mongoose.Schema({
     trim: true,
     maxlength: [2000, "Description cannot be more than 2000 characters"],
   },
+  category: {
+    type: String,
+    enum: [
+      "Electrical",
+      "Plumbing",
+      "Housekeeping",
+      "Internet",
+      "Mess",
+      "Furniture",
+      "Other",
+    ],
+    default: "Other",
+  },
   status: {
     type: String,
     enum: ["Open", "In Progress", "Resolved", "Rejected"],

@@ -389,7 +389,7 @@ const AdminLayout = () => {
         {/* Header */}
         <header className="bg-white border-b border-gray-200 px-4 md:px-8 h-12 sticky top-0 z-10 flex items-center justify-between">
           <div className="flex items-center">
-            {/* Hamburger — visible only < lg */}
+            {/* Hamburger - visible only < lg */}
             <button
               onClick={() => setIsOpen(!isOpen)}
               className="mr-3 lg:hidden text-gray-600 hover:text-gray-900 relative w-5 h-5"

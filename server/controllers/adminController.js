@@ -11,8 +11,18 @@ exports.getHealth = (req, res) => {
 exports.getAnalytics = async (req, res) => {
   try {
     const complaints = await Complaint.find().select(
-      "status createdAt updatedAt statusHistory",
+      "status category createdAt updatedAt statusHistory",
     );
+
+    const categories = [
+      "Electrical",
+      "Plumbing",
+      "Housekeeping",
+      "Internet",
+      "Mess",
+      "Furniture",
+      "Other",
+    ];
 
     const total = complaints.length;
     const open = complaints.filter((c) => c.status === "Open").length;
@@ -97,6 +107,24 @@ exports.getAnalytics = async (req, res) => {
         ? Math.round(((inProgress + resolved + rejected) / total) * 100)
         : 0;
 
+    const categoryCounts = categories.reduce((acc, category) => {
+      acc[category] = complaints.filter((c) => c.category === category).length;
+      return acc;
+    }, {});
+
+    const categoryDistribution = categories.reduce((acc, category) => {
+      acc[category] =
+        total > 0 ? Math.round((categoryCounts[category] / total) * 100) : 0;
+      return acc;
+    }, {});
+
+    const mostFrequentCategory =
+      categories.reduce(
+        (top, category) =>
+          categoryCounts[category] > categoryCounts[top] ? category : top,
+        "Other",
+      ) || "Other";
+
     res.status(200).json({
       success: true,
       data: {
@@ -105,6 +133,11 @@ exports.getAnalytics = async (req, res) => {
         responseRate,
         dailyTrend: dailyData,
         weeklyTrend: weeklyData,
+        categoryAnalytics: {
+          counts: categoryCounts,
+          distribution: categoryDistribution,
+          mostFrequentCategory,
+        },
       },
     });
   } catch (error) {
@@ -119,13 +152,14 @@ exports.getAnalytics = async (req, res) => {
 exports.getAllComplaints = async (req, res) => {
   try {
     const complaints = await Complaint.find()
-      .populate("userId", "fullName email hostel roomNumber rollNumber")
+      .populate("userId", "fullName email hostel roomNumber rollNumber role")
       .sort({ createdAt: -1 });
 
     const formattedComplaints = complaints.map((complaint) => ({
       id: complaint._id,
       title: complaint.title,
       description: complaint.description,
+      category: complaint.category || "Other",
       status: complaint.status,
       hostel: complaint.hostel,
       roomNumber: complaint.roomNumber,
@@ -139,11 +173,12 @@ exports.getAllComplaints = async (req, res) => {
       rejectedBy: complaint.rejectedBy,
       rejectedAt: complaint.rejectedAt,
       student: {
-        name: complaint.userId?.fullName || "Unknown",
-        email: complaint.userId?.email || "",
-        hostel: complaint.userId?.hostel || complaint.hostel || "N/A",
+        // Prefer immutable snapshot values saved at complaint submission time.
+        name: complaint.userName || complaint.userId?.fullName || "Unknown",
+        email: complaint.userEmail || complaint.userId?.email || "",
+        hostel: complaint.hostel || complaint.userId?.hostel || "N/A",
         roomNumber:
-          complaint.userId?.roomNumber || complaint.roomNumber || "N/A",
+          complaint.roomNumber || complaint.userId?.roomNumber || "N/A",
         rollNumber: complaint.userId?.rollNumber || null,
       },
     }));

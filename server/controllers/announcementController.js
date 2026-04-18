@@ -1,6 +1,6 @@
 const Announcement = require("../models/Announcement");
 
-// GET /api/announcements — all announcements (students & admin)
+// GET /api/announcements - all announcements (students & admin)
 exports.getAnnouncements = async (req, res) => {
   try {
     const announcements = await Announcement.find()
@@ -21,7 +21,7 @@ exports.getAnnouncements = async (req, res) => {
   }
 };
 
-// GET /api/announcements/unseen-count — count of unseen announcements for logged-in student
+// GET /api/announcements/unseen-count - count of unseen announcements for logged-in student
 exports.getUnseenCount = async (req, res) => {
   try {
     const count = await Announcement.countDocuments({
@@ -41,7 +41,7 @@ exports.getUnseenCount = async (req, res) => {
   }
 };
 
-// PUT /api/announcements/mark-seen — mark all announcements as seen by this student
+// PUT /api/announcements/mark-seen - mark all announcements as seen by this student
 exports.markAllSeen = async (req, res) => {
   try {
     await Announcement.updateMany(
@@ -62,7 +62,7 @@ exports.markAllSeen = async (req, res) => {
   }
 };
 
-// POST /api/announcements — create announcement (admin only, handled by admin routes)
+// POST /api/announcements - create announcement (admin only, handled by admin routes)
 exports.createAnnouncement = async (req, res) => {
   try {
     const { title, content, tag } = req.body;
@@ -96,7 +96,7 @@ exports.createAnnouncement = async (req, res) => {
   }
 };
 
-// DELETE /api/announcements/:id — delete announcement (admin only)
+// DELETE /api/announcements/:id - delete announcement (admin only)
 exports.deleteAnnouncement = async (req, res) => {
   try {
     const announcement = await Announcement.findByIdAndDelete(req.params.id);

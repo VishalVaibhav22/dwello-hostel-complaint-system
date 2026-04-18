@@ -44,6 +44,17 @@ const AdminDashboard = () => {
     resolved: 0,
     rejected: 0,
   });
+  const [categoryFilter, setCategoryFilter] = useState("All");
+
+  const CATEGORY_OPTIONS = [
+    "Electrical",
+    "Plumbing",
+    "Housekeeping",
+    "Internet",
+    "Mess",
+    "Furniture",
+    "Other",
+  ];
 
   useEffect(() => {
     if (!token) {
@@ -281,6 +292,12 @@ const AdminDashboard = () => {
     });
   };
 
+  const filteredComplaints = complaints.filter(
+    (complaint) =>
+      categoryFilter === "All" ||
+      (complaint.category || "Other") === categoryFilter,
+  );
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -291,172 +308,604 @@ const AdminDashboard = () => {
 
   return (
     <>
-          {error && (
-            <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-              {error}
-            </div>
-          )}
+      {error && (
+        <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+          {error}
+        </div>
+      )}
 
-          {activeTab === "complaints" && (
-            <>
-              {/* Stat Cards — clean white */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-                  <div className="flex items-center justify-between mb-1">
-                    <p className="text-gray-500 text-sm font-medium">Total</p>
-                    <div className="w-9 h-9 bg-slate-100 rounded-lg flex items-center justify-center">
-                      <svg
-                        className="w-5 h-5 text-slate-600"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                  <p className="text-3xl font-bold text-gray-900">
-                    {stats.total}
-                  </p>
-                </div>
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-                  <div className="flex items-center justify-between mb-1">
-                    <p className="text-gray-500 text-sm font-medium">Open</p>
-                    <div className="w-9 h-9 bg-orange-50 rounded-lg flex items-center justify-center">
-                      <svg
-                        className="w-5 h-5 text-orange-500"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                  <p className="text-3xl font-bold text-gray-900">
-                    {stats.open}
-                  </p>
-                </div>
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-                  <div className="flex items-center justify-between mb-1">
-                    <p className="text-gray-500 text-sm font-medium">
-                      In Progress
-                    </p>
-                    <div className="w-9 h-9 bg-blue-50 rounded-lg flex items-center justify-center">
-                      <svg
-                        className="w-5 h-5 text-blue-500"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                  <p className="text-3xl font-bold text-gray-900">
-                    {stats.inProgress}
-                  </p>
-                </div>
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-                  <div className="flex items-center justify-between mb-1">
-                    <p className="text-gray-500 text-sm font-medium">
-                      Resolved
-                    </p>
-                    <div className="w-9 h-9 bg-teal-50 rounded-lg flex items-center justify-center">
-                      <svg
-                        className="w-5 h-5 text-teal-500"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                  <p className="text-3xl font-bold text-gray-900">
-                    {stats.resolved}
-                  </p>
-                </div>
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-                  <div className="flex items-center justify-between mb-1">
-                    <p className="text-gray-500 text-sm font-medium">
-                      Rejected
-                    </p>
-                    <div className="w-9 h-9 bg-red-50 rounded-lg flex items-center justify-center">
-                      <svg
-                        className="w-5 h-5 text-red-500"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                  <p className="text-3xl font-bold text-gray-900">
-                    {stats.rejected}
-                  </p>
+      {activeTab === "complaints" && (
+        <>
+          {/* Stat Cards - clean white */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+              <div className="flex items-center justify-between mb-1">
+                <p className="text-gray-500 text-sm font-medium">Total</p>
+                <div className="w-9 h-9 bg-slate-100 rounded-lg flex items-center justify-center">
+                  <svg
+                    className="w-5 h-5 text-slate-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    />
+                  </svg>
                 </div>
               </div>
+              <p className="text-3xl font-bold text-gray-900">{stats.total}</p>
+            </div>
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+              <div className="flex items-center justify-between mb-1">
+                <p className="text-gray-500 text-sm font-medium">Open</p>
+                <div className="w-9 h-9 bg-orange-50 rounded-lg flex items-center justify-center">
+                  <svg
+                    className="w-5 h-5 text-orange-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <p className="text-3xl font-bold text-gray-900">{stats.open}</p>
+            </div>
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+              <div className="flex items-center justify-between mb-1">
+                <p className="text-gray-500 text-sm font-medium">In Progress</p>
+                <div className="w-9 h-9 bg-blue-50 rounded-lg flex items-center justify-center">
+                  <svg
+                    className="w-5 h-5 text-blue-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <p className="text-3xl font-bold text-gray-900">
+                {stats.inProgress}
+              </p>
+            </div>
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+              <div className="flex items-center justify-between mb-1">
+                <p className="text-gray-500 text-sm font-medium">Resolved</p>
+                <div className="w-9 h-9 bg-teal-50 rounded-lg flex items-center justify-center">
+                  <svg
+                    className="w-5 h-5 text-teal-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <p className="text-3xl font-bold text-gray-900">
+                {stats.resolved}
+              </p>
+            </div>
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+              <div className="flex items-center justify-between mb-1">
+                <p className="text-gray-500 text-sm font-medium">Rejected</p>
+                <div className="w-9 h-9 bg-red-50 rounded-lg flex items-center justify-center">
+                  <svg
+                    className="w-5 h-5 text-red-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <p className="text-3xl font-bold text-gray-900">
+                {stats.rejected}
+              </p>
+            </div>
+          </div>
 
-              {/* Two-column: Recent Complaints + Analytics Preview */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Recent Complaints Table */}
-                <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden flex flex-col">
-                  <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between flex-shrink-0">
-                    <h3 className="text-lg font-bold text-gray-900">
-                      Recent Complaints
-                    </h3>
-                    <button
-                      onClick={() => navigate("/admin/all-complaints")}
-                      className="text-primary hover:text-blue-800 text-sm font-medium transition-colors flex items-center gap-1"
+          {/* Two-column: Recent Complaints + Analytics Preview */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Recent Complaints Table */}
+            <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden flex flex-col">
+              <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between flex-shrink-0">
+                <h3 className="text-lg font-bold text-gray-900">
+                  Recent Complaints
+                </h3>
+                <div className="flex items-center gap-3">
+                  <select
+                    value={categoryFilter}
+                    onChange={(e) => setCategoryFilter(e.target.value)}
+                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
+                  >
+                    <option value="All">All Categories</option>
+                    {CATEGORY_OPTIONS.map((category) => (
+                      <option key={category} value={category}>
+                        {category}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    onClick={() => navigate("/admin/all-complaints")}
+                    className="text-primary hover:text-blue-800 text-sm font-medium transition-colors flex items-center gap-1"
+                  >
+                    <span>View all</span>
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
                     >
-                      <span>View all</span>
-                      <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M9 5l7 7-7 7"
-                        />
-                      </svg>
-                    </button>
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 5l7 7-7 7"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <div className="overflow-auto" style={{ maxHeight: "500px" }}>
+                {filteredComplaints.length === 0 ? (
+                  <div className="p-8 text-center text-gray-500">
+                    <svg
+                      className="w-16 h-16 mx-auto mb-4 text-gray-300"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                      />
+                    </svg>
+                    <p className="font-medium">No complaints found</p>
                   </div>
-                  <div className="overflow-auto" style={{ maxHeight: "500px" }}>
-                    {complaints.length === 0 ? (
-                      <div className="p-8 text-center text-gray-500">
+                ) : (
+                  <table className="w-full">
+                    <thead className="bg-gray-50 border-b border-gray-200">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                          Complaint Title
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                          Student Name
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                          Hostel / Room
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                          Status
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                          Date Submitted
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                          Action
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200">
+                      {filteredComplaints.slice(0, 10).map((complaint) => (
+                        <tr
+                          key={complaint.id}
+                          className="hover:bg-gray-50 transition-colors"
+                        >
+                          <td className="px-6 py-4">
+                            <p className="text-sm font-medium text-gray-900 line-clamp-1">
+                              {complaint.title}
+                            </p>
+                          </td>
+                          <td className="px-6 py-4">
+                            <p className="text-sm text-gray-600">
+                              {complaint.student?.name || "Unknown"}
+                            </p>
+                          </td>
+                          <td className="px-6 py-4">
+                            <p className="text-sm text-gray-600">
+                              {complaint.hostel} / {complaint.roomNumber}
+                            </p>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span
+                              className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full whitespace-nowrap ${getStatusColor(complaint.status)}`}
+                            >
+                              {complaint.status}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <p className="text-sm text-gray-600">
+                              {formatDate(complaint.dateSubmitted)}
+                            </p>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center gap-2">
+                              {/* View Button */}
+                              <button
+                                id={`viewComplaintBtn-${complaint.id}`}
+                                onClick={() => handleViewDetails(complaint)}
+                                className="text-primary hover:text-blue-800 font-medium text-sm"
+                              >
+                                View
+                              </button>
+
+                              {/* Status Actions */}
+                              {complaint.status === "Open" && (
+                                <button
+                                  id={`markInProgressBtn-${complaint.id}`}
+                                  onClick={() =>
+                                    handleStatusUpdate(
+                                      complaint.id,
+                                      "In Progress",
+                                    )
+                                  }
+                                  className="text-blue-600 hover:text-blue-800 font-medium text-xs px-2 py-1 rounded hover:bg-blue-50 transition-colors whitespace-nowrap"
+                                >
+                                  Mark Progress
+                                </button>
+                              )}
+                              {complaint.status === "In Progress" && (
+                                <button
+                                  id={`markResolvedBtn-${complaint.id}`}
+                                  onClick={() =>
+                                    handleStatusUpdate(complaint.id, "Resolved")
+                                  }
+                                  className="text-teal-600 hover:text-teal-800 font-medium text-xs px-2 py-1 rounded hover:bg-teal-50 transition-colors whitespace-nowrap"
+                                >
+                                  Resolve
+                                </button>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+            </div>
+
+            {/* Analytics Preview */}
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 flex flex-col h-fit lg:sticky lg:top-24">
+              <div className="flex items-center justify-between mb-6 flex-shrink-0">
+                <h3 className="text-lg font-bold text-gray-900">Analytics</h3>
+                <button
+                  onClick={() => navigate("/admin/analytics")}
+                  className="text-primary hover:text-blue-800 text-sm font-medium transition-colors flex items-center gap-1"
+                >
+                  <span>Full report</span>
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
+                </button>
+              </div>
+              {(() => {
+                const sd = analyticsData?.statusDistribution || {
+                  open: 0,
+                  inProgress: 0,
+                  resolved: 0,
+                  rejected: 0,
+                  total: 0,
+                };
+                const t = sd.total || 1;
+                // Use larger radius for better visibility
+                const radius = 40;
+                const circumference = 2 * Math.PI * radius;
+
+                // Calculate percentages
+                const openPercent = (sd.open / t) * 100;
+                const inProgressPercent = (sd.inProgress / t) * 100;
+                const resolvedPercent = (sd.resolved / t) * 100;
+                const rejectedPercent = (sd.rejected / t) * 100;
+
+                // Calculate arc lengths
+                const openArc = (openPercent / 100) * circumference;
+                const inProgressArc = (inProgressPercent / 100) * circumference;
+                const resolvedArc = (resolvedPercent / 100) * circumference;
+                const rejectedArc = (rejectedPercent / 100) * circumference;
+
+                return (
+                  <div className="flex flex-col items-center">
+                    <div className="relative w-44 h-44 mb-6 flex-shrink-0">
+                      {sd.total === 0 ? (
+                        <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm">
+                          No data
+                        </div>
+                      ) : (
+                        <>
+                          <svg
+                            className="w-full h-full transform -rotate-90"
+                            viewBox="0 0 100 100"
+                          >
+                            {/* Background circle */}
+                            <circle
+                              cx="50"
+                              cy="50"
+                              r={radius}
+                              fill="none"
+                              stroke="#f3f4f6"
+                              strokeWidth="12"
+                            />
+                            {/* Open segment */}
+                            {sd.open > 0 && (
+                              <circle
+                                cx="50"
+                                cy="50"
+                                r={radius}
+                                fill="none"
+                                stroke="#fb923c"
+                                strokeWidth="12"
+                                strokeDasharray={`${openArc} ${circumference}`}
+                                strokeDashoffset="0"
+                              />
+                            )}
+                            {/* In Progress segment */}
+                            {sd.inProgress > 0 && (
+                              <circle
+                                cx="50"
+                                cy="50"
+                                r={radius}
+                                fill="none"
+                                stroke="#3b82f6"
+                                strokeWidth="12"
+                                strokeDasharray={`${inProgressArc} ${circumference}`}
+                                strokeDashoffset={`-${openArc}`}
+                              />
+                            )}
+                            {/* Resolved segment */}
+                            {sd.resolved > 0 && (
+                              <circle
+                                cx="50"
+                                cy="50"
+                                r={radius}
+                                fill="none"
+                                stroke="#14b8a6"
+                                strokeWidth="12"
+                                strokeDasharray={`${resolvedArc} ${circumference}`}
+                                strokeDashoffset={`-${openArc + inProgressArc}`}
+                              />
+                            )}
+                            {/* Rejected segment */}
+                            {sd.rejected > 0 && (
+                              <circle
+                                cx="50"
+                                cy="50"
+                                r={radius}
+                                fill="none"
+                                stroke="#ef4444"
+                                strokeWidth="12"
+                                strokeDasharray={`${rejectedArc} ${circumference}`}
+                                strokeDashoffset={`-${openArc + inProgressArc + resolvedArc}`}
+                              />
+                            )}
+                          </svg>
+                          <div className="absolute inset-0 flex flex-col items-center justify-center">
+                            <span className="text-2xl font-bold text-gray-900">
+                              {sd.total}
+                            </span>
+                            <span className="text-xs text-gray-500 mt-0.5">
+                              Total
+                            </span>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                    <div className="w-full space-y-3 mb-5">
+                      <div className="flex items-center justify-between py-1.5">
+                        <div className="flex items-center space-x-2.5">
+                          <div className="w-3 h-3 bg-orange-400 rounded-full flex-shrink-0"></div>
+                          <span className="text-sm text-gray-700 font-medium">
+                            Open
+                          </span>
+                        </div>
+                        <span className="text-sm font-bold text-gray-900">
+                          {sd.open}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between py-1.5">
+                        <div className="flex items-center space-x-2.5">
+                          <div className="w-3 h-3 bg-blue-500 rounded-full flex-shrink-0"></div>
+                          <span className="text-sm text-gray-700 font-medium">
+                            In Progress
+                          </span>
+                        </div>
+                        <span className="text-sm font-bold text-gray-900">
+                          {sd.inProgress}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between py-1.5">
+                        <div className="flex items-center space-x-2.5">
+                          <div className="w-3 h-3 bg-teal-500 rounded-full flex-shrink-0"></div>
+                          <span className="text-sm text-gray-700 font-medium">
+                            Resolved
+                          </span>
+                        </div>
+                        <span className="text-sm font-bold text-gray-900">
+                          {sd.resolved}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between py-1.5">
+                        <div className="flex items-center space-x-2.5">
+                          <div className="w-3 h-3 bg-red-500 rounded-full flex-shrink-0"></div>
+                          <span className="text-sm text-gray-700 font-medium">
+                            Rejected
+                          </span>
+                        </div>
+                        <span className="text-sm font-bold text-gray-900">
+                          {sd.rejected}
+                        </span>
+                      </div>
+                    </div>
+                    {analyticsData?.responseRate !== undefined && (
+                      <div className="w-full pt-5 border-t border-gray-200">
+                        <div className="flex justify-between text-sm mb-2">
+                          <span className="text-gray-600 font-medium">
+                            Response Rate
+                          </span>
+                          <span className="font-bold text-gray-900">
+                            {analyticsData.responseRate}%
+                          </span>
+                        </div>
+                        <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-gradient-to-r from-primary to-blue-600 rounded-full transition-all duration-500"
+                            style={{
+                              width: `${Math.min(analyticsData.responseRate, 100)}%`,
+                            }}
+                          ></div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Announcements Management */}
+      {activeTab === "announcements" && (
+        <div>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+            <h2 className="text-xl sm:text-2xl font-semibold text-textPrimary">
+              Manage Announcements
+            </h2>
+            <button
+              onClick={() => setShowAnnouncementModal(true)}
+              className="flex items-center space-x-2 bg-primary hover:bg-blue-800 text-white font-semibold py-2.5 px-5 rounded-lg transition-colors shadow-sm"
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4v16m8-8H4"
+                />
+              </svg>
+              <span>New Announcement</span>
+            </button>
+          </div>
+
+          {announcements.length === 0 ? (
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-12 text-center">
+              <svg
+                className="w-16 h-16 mx-auto mb-4 text-gray-300"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"
+                />
+              </svg>
+              <p className="font-medium text-gray-500">No announcements yet</p>
+              <p className="text-sm text-gray-400 mt-1">
+                Create one to notify students.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {announcements.map((a) => {
+                const tagColors = {
+                  Urgent: "bg-red-100 text-red-700",
+                  Maintenance: "bg-amber-100 text-amber-700",
+                  Notice: "bg-blue-100 text-blue-700",
+                  Event: "bg-purple-100 text-purple-700",
+                  General: "bg-gray-100 text-gray-700",
+                };
+                return (
+                  <div
+                    key={a._id}
+                    className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6"
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-3 mb-2">
+                          <h3 className="text-lg font-semibold text-gray-900 truncate">
+                            {a.title}
+                          </h3>
+                          <span
+                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+                              tagColors[a.tag] || tagColors.General
+                            }`}
+                          >
+                            {a.tag}
+                          </span>
+                        </div>
+                        <p className="text-gray-600 text-sm whitespace-pre-line mb-3">
+                          {a.content}
+                        </p>
+                        <p className="text-xs text-gray-400">
+                          {new Date(a.createdAt).toLocaleDateString("en-IN", {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric",
+                          })}{" "}
+                          at{" "}
+                          {new Date(a.createdAt).toLocaleTimeString("en-IN", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                          {a.createdBy?.fullName &&
+                            ` · by ${a.createdBy.fullName}`}
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => handleDeleteAnnouncement(a._id)}
+                        className="flex-shrink-0 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Delete announcement"
+                      >
                         <svg
-                          className="w-16 h-16 mx-auto mb-4 text-gray-300"
+                          className="w-5 h-5"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -465,460 +914,18 @@ const AdminDashboard = () => {
                             strokeLinecap="round"
                             strokeLinejoin="round"
                             strokeWidth={2}
-                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
                           />
                         </svg>
-                        <p className="font-medium">No complaints found</p>
-                      </div>
-                    ) : (
-                      <table className="w-full">
-                        <thead className="bg-gray-50 border-b border-gray-200">
-                          <tr>
-                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                              Complaint Title
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                              Student Name
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                              Hostel / Room
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                              Status
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                              Date Submitted
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                              Action
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-200">
-                          {complaints.slice(0, 10).map((complaint) => (
-                            <tr
-                              key={complaint.id}
-                              className="hover:bg-gray-50 transition-colors"
-                            >
-                              <td className="px-6 py-4">
-                                <p className="text-sm font-medium text-gray-900 line-clamp-1">
-                                  {complaint.title}
-                                </p>
-                              </td>
-                              <td className="px-6 py-4">
-                                <p className="text-sm text-gray-600">
-                                  {complaint.student?.name || "Unknown"}
-                                </p>
-                              </td>
-                              <td className="px-6 py-4">
-                                <p className="text-sm text-gray-600">
-                                  {complaint.hostel} / {complaint.roomNumber}
-                                </p>
-                              </td>
-                              <td className="px-6 py-4">
-                                <span
-                                  className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full whitespace-nowrap ${getStatusColor(complaint.status)}`}
-                                >
-                                  {complaint.status}
-                                </span>
-                              </td>
-                              <td className="px-6 py-4">
-                                <p className="text-sm text-gray-600">
-                                  {formatDate(complaint.dateSubmitted)}
-                                </p>
-                              </td>
-                              <td className="px-6 py-4">
-                                <div className="flex items-center gap-2">
-                                  {/* View Button */}
-                                  <button
-                                    id={`viewComplaintBtn-${complaint.id}`}
-                                    onClick={() => handleViewDetails(complaint)}
-                                    className="text-primary hover:text-blue-800 font-medium text-sm"
-                                  >
-                                    View
-                                  </button>
-
-                                  {/* Status Actions */}
-                                  {complaint.status === "Open" && (
-                                    <button
-                                      id={`markInProgressBtn-${complaint.id}`}
-                                      onClick={() =>
-                                        handleStatusUpdate(
-                                          complaint.id,
-                                          "In Progress",
-                                        )
-                                      }
-                                      className="text-blue-600 hover:text-blue-800 font-medium text-xs px-2 py-1 rounded hover:bg-blue-50 transition-colors whitespace-nowrap"
-                                    >
-                                      Mark Progress
-                                    </button>
-                                  )}
-                                  {complaint.status === "In Progress" && (
-                                    <button
-                                      id={`markResolvedBtn-${complaint.id}`}
-                                      onClick={() =>
-                                        handleStatusUpdate(
-                                          complaint.id,
-                                          "Resolved",
-                                        )
-                                      }
-                                      className="text-teal-600 hover:text-teal-800 font-medium text-xs px-2 py-1 rounded hover:bg-teal-50 transition-colors whitespace-nowrap"
-                                    >
-                                      Resolve
-                                    </button>
-                                  )}
-                                </div>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    )}
+                      </button>
+                    </div>
                   </div>
-                </div>
-
-                {/* Analytics Preview */}
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 flex flex-col h-fit lg:sticky lg:top-24">
-                  <div className="flex items-center justify-between mb-6 flex-shrink-0">
-                    <h3 className="text-lg font-bold text-gray-900">
-                      Analytics
-                    </h3>
-                    <button
-                      onClick={() => navigate("/admin/analytics")}
-                      className="text-primary hover:text-blue-800 text-sm font-medium transition-colors flex items-center gap-1"
-                    >
-                      <span>Full report</span>
-                      <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M9 5l7 7-7 7"
-                        />
-                      </svg>
-                    </button>
-                  </div>
-                  {(() => {
-                    const sd = analyticsData?.statusDistribution || {
-                      open: 0,
-                      inProgress: 0,
-                      resolved: 0,
-                      rejected: 0,
-                      total: 0,
-                    };
-                    const t = sd.total || 1;
-                    // Use larger radius for better visibility
-                    const radius = 40;
-                    const circumference = 2 * Math.PI * radius;
-
-                    // Calculate percentages
-                    const openPercent = (sd.open / t) * 100;
-                    const inProgressPercent = (sd.inProgress / t) * 100;
-                    const resolvedPercent = (sd.resolved / t) * 100;
-                    const rejectedPercent = (sd.rejected / t) * 100;
-
-                    // Calculate arc lengths
-                    const openArc = (openPercent / 100) * circumference;
-                    const inProgressArc =
-                      (inProgressPercent / 100) * circumference;
-                    const resolvedArc = (resolvedPercent / 100) * circumference;
-                    const rejectedArc = (rejectedPercent / 100) * circumference;
-
-                    return (
-                      <div className="flex flex-col items-center">
-                        <div className="relative w-44 h-44 mb-6 flex-shrink-0">
-                          {sd.total === 0 ? (
-                            <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm">
-                              No data
-                            </div>
-                          ) : (
-                            <>
-                              <svg
-                                className="w-full h-full transform -rotate-90"
-                                viewBox="0 0 100 100"
-                              >
-                                {/* Background circle */}
-                                <circle
-                                  cx="50"
-                                  cy="50"
-                                  r={radius}
-                                  fill="none"
-                                  stroke="#f3f4f6"
-                                  strokeWidth="12"
-                                />
-                                {/* Open segment */}
-                                {sd.open > 0 && (
-                                  <circle
-                                    cx="50"
-                                    cy="50"
-                                    r={radius}
-                                    fill="none"
-                                    stroke="#fb923c"
-                                    strokeWidth="12"
-                                    strokeDasharray={`${openArc} ${circumference}`}
-                                    strokeDashoffset="0"
-                                  />
-                                )}
-                                {/* In Progress segment */}
-                                {sd.inProgress > 0 && (
-                                  <circle
-                                    cx="50"
-                                    cy="50"
-                                    r={radius}
-                                    fill="none"
-                                    stroke="#3b82f6"
-                                    strokeWidth="12"
-                                    strokeDasharray={`${inProgressArc} ${circumference}`}
-                                    strokeDashoffset={`-${openArc}`}
-                                  />
-                                )}
-                                {/* Resolved segment */}
-                                {sd.resolved > 0 && (
-                                  <circle
-                                    cx="50"
-                                    cy="50"
-                                    r={radius}
-                                    fill="none"
-                                    stroke="#14b8a6"
-                                    strokeWidth="12"
-                                    strokeDasharray={`${resolvedArc} ${circumference}`}
-                                    strokeDashoffset={`-${openArc + inProgressArc}`}
-                                  />
-                                )}
-                                {/* Rejected segment */}
-                                {sd.rejected > 0 && (
-                                  <circle
-                                    cx="50"
-                                    cy="50"
-                                    r={radius}
-                                    fill="none"
-                                    stroke="#ef4444"
-                                    strokeWidth="12"
-                                    strokeDasharray={`${rejectedArc} ${circumference}`}
-                                    strokeDashoffset={`-${openArc + inProgressArc + resolvedArc}`}
-                                  />
-                                )}
-                              </svg>
-                              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                <span className="text-2xl font-bold text-gray-900">
-                                  {sd.total}
-                                </span>
-                                <span className="text-xs text-gray-500 mt-0.5">
-                                  Total
-                                </span>
-                              </div>
-                            </>
-                          )}
-                        </div>
-                        <div className="w-full space-y-3 mb-5">
-                          <div className="flex items-center justify-between py-1.5">
-                            <div className="flex items-center space-x-2.5">
-                              <div className="w-3 h-3 bg-orange-400 rounded-full flex-shrink-0"></div>
-                              <span className="text-sm text-gray-700 font-medium">
-                                Open
-                              </span>
-                            </div>
-                            <span className="text-sm font-bold text-gray-900">
-                              {sd.open}
-                            </span>
-                          </div>
-                          <div className="flex items-center justify-between py-1.5">
-                            <div className="flex items-center space-x-2.5">
-                              <div className="w-3 h-3 bg-blue-500 rounded-full flex-shrink-0"></div>
-                              <span className="text-sm text-gray-700 font-medium">
-                                In Progress
-                              </span>
-                            </div>
-                            <span className="text-sm font-bold text-gray-900">
-                              {sd.inProgress}
-                            </span>
-                          </div>
-                          <div className="flex items-center justify-between py-1.5">
-                            <div className="flex items-center space-x-2.5">
-                              <div className="w-3 h-3 bg-teal-500 rounded-full flex-shrink-0"></div>
-                              <span className="text-sm text-gray-700 font-medium">
-                                Resolved
-                              </span>
-                            </div>
-                            <span className="text-sm font-bold text-gray-900">
-                              {sd.resolved}
-                            </span>
-                          </div>
-                          <div className="flex items-center justify-between py-1.5">
-                            <div className="flex items-center space-x-2.5">
-                              <div className="w-3 h-3 bg-red-500 rounded-full flex-shrink-0"></div>
-                              <span className="text-sm text-gray-700 font-medium">
-                                Rejected
-                              </span>
-                            </div>
-                            <span className="text-sm font-bold text-gray-900">
-                              {sd.rejected}
-                            </span>
-                          </div>
-                        </div>
-                        {analyticsData?.responseRate !== undefined && (
-                          <div className="w-full pt-5 border-t border-gray-200">
-                            <div className="flex justify-between text-sm mb-2">
-                              <span className="text-gray-600 font-medium">
-                                Response Rate
-                              </span>
-                              <span className="font-bold text-gray-900">
-                                {analyticsData.responseRate}%
-                              </span>
-                            </div>
-                            <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
-                              <div
-                                className="h-full bg-gradient-to-r from-primary to-blue-600 rounded-full transition-all duration-500"
-                                style={{
-                                  width: `${Math.min(analyticsData.responseRate, 100)}%`,
-                                }}
-                              ></div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })()}
-                </div>
-              </div>
-            </>
-          )}
-
-          {/* Announcements Management */}
-          {activeTab === "announcements" && (
-            <div>
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-                <h2 className="text-xl sm:text-2xl font-semibold text-textPrimary">
-                  Manage Announcements
-                </h2>
-                <button
-                  onClick={() => setShowAnnouncementModal(true)}
-                  className="flex items-center space-x-2 bg-primary hover:bg-blue-800 text-white font-semibold py-2.5 px-5 rounded-lg transition-colors shadow-sm"
-                >
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 4v16m8-8H4"
-                    />
-                  </svg>
-                  <span>New Announcement</span>
-                </button>
-              </div>
-
-              {announcements.length === 0 ? (
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-12 text-center">
-                  <svg
-                    className="w-16 h-16 mx-auto mb-4 text-gray-300"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"
-                    />
-                  </svg>
-                  <p className="font-medium text-gray-500">
-                    No announcements yet
-                  </p>
-                  <p className="text-sm text-gray-400 mt-1">
-                    Create one to notify students.
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {announcements.map((a) => {
-                    const tagColors = {
-                      Urgent: "bg-red-100 text-red-700",
-                      Maintenance: "bg-amber-100 text-amber-700",
-                      Notice: "bg-blue-100 text-blue-700",
-                      Event: "bg-purple-100 text-purple-700",
-                      General: "bg-gray-100 text-gray-700",
-                    };
-                    return (
-                      <div
-                        key={a._id}
-                        className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6"
-                      >
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-3 mb-2">
-                              <h3 className="text-lg font-semibold text-gray-900 truncate">
-                                {a.title}
-                              </h3>
-                              <span
-                                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${
-                                  tagColors[a.tag] || tagColors.General
-                                }`}
-                              >
-                                {a.tag}
-                              </span>
-                            </div>
-                            <p className="text-gray-600 text-sm whitespace-pre-line mb-3">
-                              {a.content}
-                            </p>
-                            <p className="text-xs text-gray-400">
-                              {new Date(a.createdAt).toLocaleDateString(
-                                "en-IN",
-                                {
-                                  day: "numeric",
-                                  month: "short",
-                                  year: "numeric",
-                                },
-                              )}{" "}
-                              at{" "}
-                              {new Date(a.createdAt).toLocaleTimeString(
-                                "en-IN",
-                                {
-                                  hour: "2-digit",
-                                  minute: "2-digit",
-                                },
-                              )}
-                              {a.createdBy?.fullName &&
-                                ` · by ${a.createdBy.fullName}`}
-                            </p>
-                          </div>
-                          <button
-                            onClick={() => handleDeleteAnnouncement(a._id)}
-                            className="flex-shrink-0 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                            title="Delete announcement"
-                          >
-                            <svg
-                              className="w-5 h-5"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                              />
-                            </svg>
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
+                );
+              })}
             </div>
           )}
+        </div>
+      )}
 
       {/* Create Announcement Modal */}
       {showAnnouncementModal && (
@@ -1153,6 +1160,16 @@ const AdminDashboard = () => {
                 </p>
               </div>
 
+              {/* Category */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-600 mb-2">
+                  Category
+                </label>
+                <span className="inline-flex px-3 py-1 text-xs font-semibold rounded-full bg-indigo-100 text-indigo-700 whitespace-nowrap">
+                  {selectedComplaint.category || "Other"}
+                </span>
+              </div>
+
               {/* Attached Images */}
               <div>
                 <label className="block text-sm font-semibold text-gray-600 mb-2">
@@ -1163,8 +1180,7 @@ const AdminDashboard = () => {
                   <div className="flex flex-wrap gap-3">
                     {selectedComplaint.images.map((filename, idx) => {
                       const url = getImageUrl(filename);
-                      const token = localStorage.getItem("token");
-                      const authUrl = `${url}?token=${token}`;
+                      const authUrl = url;
                       return (
                         <button
                           key={idx}
@@ -1233,7 +1249,7 @@ const AdminDashboard = () => {
                         </span>
                         <span className="text-gray-400">&bull;</span>
                         <span className="text-gray-700">
-                          {slot.startTime} – {slot.endTime}
+                          {slot.startTime} - {slot.endTime}
                         </span>
                       </div>
                     ))}

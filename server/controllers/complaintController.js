@@ -2,6 +2,25 @@ const Complaint = require("../models/Complaint");
 const User = require("../models/User");
 const Notification = require("../models/Notification");
 const { validationResult } = require("express-validator");
+const axios = require("axios");
+const {
+  uploadComplaintImages,
+  isImageKitConfigured,
+  missingImageKitEnv,
+} = require("../utils/imagekit");
+
+const VALID_CATEGORIES = [
+  "Electrical",
+  "Plumbing",
+  "Housekeeping",
+  "Internet",
+  "Mess",
+  "Furniture",
+  "Other",
+];
+
+const AI_SERVICE_URL =
+  process.env.AI_SERVICE_URL || "http://localhost:8000/predict";
 
 exports.getMyComplaints = async (req, res) => {
   try {
@@ -58,6 +77,18 @@ exports.getComplaintById = async (req, res) => {
 
 exports.createComplaint = async (req, res) => {
   try {
+    const normalizedRole = String(req.user?.role || "")
+      .trim()
+      .toLowerCase();
+
+    // Block admins explicitly; allow legacy student records that may miss role.
+    if (normalizedRole === "admin") {
+      return res.status(403).json({
+        success: false,
+        message: "Only students can submit complaints.",
+      });
+    }
+
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({
@@ -68,9 +99,41 @@ exports.createComplaint = async (req, res) => {
     }
 
     const { title, description } = req.body;
+    const hostel = req.body.hostel || req.user.hostel;
+    const roomNumber = req.body.roomNumber || req.user.roomNumber;
 
-    // Collect uploaded image filenames
-    const images = req.files ? req.files.map((f) => f.filename) : [];
+    if (!hostel || !roomNumber) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Student hostel and room number are required to submit a complaint.",
+      });
+    }
+
+    if (req.files?.length && !isImageKitConfigured) {
+      return res.status(500).json({
+        success: false,
+        message: "Image uploads are not configured on the server.",
+        missingEnv: missingImageKitEnv,
+      });
+    }
+
+    // Upload complaint images to ImageKit and persist public URLs.
+    let images = [];
+    if (req.files?.length) {
+      try {
+        images = await uploadComplaintImages(
+          req.files,
+          req.user._id.toString(),
+        );
+      } catch (uploadError) {
+        console.error("ImageKit upload failed:", uploadError.message);
+        return res.status(502).json({
+          success: false,
+          message: "Failed to upload complaint images. Please try again.",
+        });
+      }
+    }
 
     // Parse availability slots if provided
     let availability = [];
@@ -78,18 +141,38 @@ exports.createComplaint = async (req, res) => {
       try {
         availability = JSON.parse(req.body.availability);
       } catch (e) {
-        // Ignore parse errors — availability is optional
+        // Ignore parse errors - availability is optional
       }
+    }
+
+    // Predict category via AI service. Never fail complaint creation on AI errors.
+    let category = "Other";
+    try {
+      const complaintText = `${title}. ${description}`;
+      const aiResponse = await axios.post(
+        AI_SERVICE_URL,
+        { text: complaintText },
+        { timeout: 2500 },
+      );
+
+      const predictedCategory = aiResponse?.data?.category;
+      if (VALID_CATEGORIES.includes(predictedCategory)) {
+        category = predictedCategory;
+      }
+    } catch (aiError) {
+      console.error("AI category prediction failed:", aiError.message);
+      category = "Other";
     }
 
     const complaint = new Complaint({
       title,
       description,
+      category,
       userId: req.user._id,
       userName: req.user.fullName,
       userEmail: req.user.email,
-      hostel: req.user.hostel,
-      roomNumber: req.user.roomNumber,
+      hostel,
+      roomNumber,
       status: "Open",
       images,
       availability,
@@ -126,6 +209,15 @@ exports.createComplaint = async (req, res) => {
     });
   } catch (error) {
     console.error("Error creating complaint:", error);
+
+    if (error.name === "ValidationError") {
+      return res.status(400).json({
+        success: false,
+        message: "Complaint validation failed",
+        error: error.message,
+      });
+    }
+
     res.status(500).json({
       success: false,
       message: "Failed to create complaint",

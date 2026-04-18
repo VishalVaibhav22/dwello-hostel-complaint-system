@@ -57,7 +57,45 @@ All authenticated endpoints require: `Authorization: Bearer <token>`
 - **POST** `/api/complaints`
 - **Access**: Authenticated (Student)
 - **Content-Type**: `multipart/form-data`
-- **Fields**: `title`, `description`, `images` (up to 3, JPG/PNG/WEBP, max 5MB each), `availability` (JSON string)
+- **Fields**:
+  - `title` (required, max 200 chars)
+  - `description` (required, max 2000 chars)
+  - `images` (optional, up to 3 files, JPG/JPEG/PNG/WEBP, max 5MB each)
+  - `availability` (optional JSON string)
+  - `hostel` (optional; defaults to logged-in student's hostel)
+  - `roomNumber` (optional; defaults to logged-in student's room number)
+- **Notes**:
+  - Complaint images are uploaded to ImageKit by the backend.
+  - `images` stored in MongoDB are public ImageKit URL strings (not local server file paths).
+  - For multipart requests, do not force `Content-Type: application/json`.
+- **Success Response (201)**:
+  ```json
+  {
+    "success": true,
+    "message": "Complaint submitted successfully",
+    "data": {
+      "_id": "661f1f...",
+      "title": "Water leakage in bathroom",
+      "description": "Tap keeps dripping all day",
+      "category": "Plumbing",
+      "status": "Open",
+      "images": [
+        "https://ik.imagekit.io/your_imagekit_id/complaints/.../photo1.jpg"
+      ],
+      "availability": [],
+      "userId": "661e...",
+      "hostel": "Hostel A",
+      "roomNumber": "101",
+      "createdAt": "2026-04-18T12:34:56.000Z",
+      "updatedAt": "2026-04-18T12:34:56.000Z"
+    }
+  }
+  ```
+- **Error Responses**:
+  - `400` validation failed / missing required student hostel-room metadata
+  - `403` requester is admin (`Only students can submit complaints.`)
+  - `500` image uploads not configured (missing ImageKit env)
+  - `502` ImageKit upload failed
 
 ---
 

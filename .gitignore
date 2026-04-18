@@ -9,14 +9,25 @@ coverage/
 # Production
 dist/
 build/
+AutomationDemo/target/
 
 # Misc
 .DS_Store
+Thumbs.db
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
 
 # Uploads (user data, auto-created at runtime)
 server/uploads/

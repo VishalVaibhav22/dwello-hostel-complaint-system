@@ -36,7 +36,10 @@ const Login = () => {
     }
 
     try {
-      const data = await loginUser(formData);
+      const data = await loginUser({
+        ...formData,
+        role: selectedRole,
+      });
 
       login(data.token, data.user);
 

@@ -26,9 +26,20 @@ const AdminAllComplaints = () => {
     searchParams.get("search") || "",
   );
   const [statusFilter, setStatusFilter] = useState("All");
+  const [categoryFilter, setCategoryFilter] = useState("All");
   const [sortOrder, setSortOrder] = useState("newest");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
+
+  const CATEGORY_OPTIONS = [
+    "Electrical",
+    "Plumbing",
+    "Housekeeping",
+    "Internet",
+    "Mess",
+    "Furniture",
+    "Other",
+  ];
 
   useEffect(() => {
     if (!token) return;
@@ -173,16 +184,19 @@ const AdminAllComplaints = () => {
         const rollNumberMatch = c.student?.rollNumber
           ?.toLowerCase()
           .includes(query);
+        const categoryMatch = c.category?.toLowerCase().includes(query);
         if (
           !titleMatch &&
           !studentNameMatch &&
           !studentEmailMatch &&
-          !rollNumberMatch
+          !rollNumberMatch &&
+          !categoryMatch
         )
           return false;
       }
       return true;
     })
+    .filter((c) => categoryFilter === "All" || c.category === categoryFilter)
     .filter((c) => statusFilter === "All" || c.status === statusFilter)
     .filter((c) => {
       if (!dateFrom && !dateTo) return true;
@@ -230,7 +244,7 @@ const AdminAllComplaints = () => {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search by complaint title, student name, email, or roll number"
+            placeholder="Search by title, category, student, email, or roll number"
             className="w-full px-4 py-3 pl-11 border border-gray-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
           />
           <svg
@@ -256,6 +270,18 @@ const AdminAllComplaints = () => {
           {filteredComplaints.length !== 1 ? "s" : ""}
         </p>
         <div className="flex flex-wrap items-center gap-3">
+          <select
+            value={categoryFilter}
+            onChange={(e) => setCategoryFilter(e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
+          >
+            <option value="All">All Categories</option>
+            {CATEGORY_OPTIONS.map((category) => (
+              <option key={category} value={category}>
+                {category}
+              </option>
+            ))}
+          </select>
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
@@ -294,10 +320,15 @@ const AdminAllComplaints = () => {
             <option value="oldest">Oldest first</option>
             <option value="status">By status</option>
           </select>
-          {(searchQuery || statusFilter !== "All" || dateFrom || dateTo) && (
+          {(searchQuery ||
+            categoryFilter !== "All" ||
+            statusFilter !== "All" ||
+            dateFrom ||
+            dateTo) && (
             <button
               onClick={() => {
                 setSearchQuery("");
+                setCategoryFilter("All");
                 setStatusFilter("All");
                 setDateFrom("");
                 setDateTo("");
@@ -352,6 +383,12 @@ const AdminAllComplaints = () => {
                     Title
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    Category
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     Student
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
@@ -359,9 +396,6 @@ const AdminAllComplaints = () => {
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     Hostel / Room
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Status
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     Date
@@ -388,6 +422,18 @@ const AdminAllComplaints = () => {
                       </p>
                     </td>
                     <td className="px-6 py-4">
+                      <span className="inline-flex px-2.5 py-1 text-xs font-semibold rounded-full bg-indigo-100 text-indigo-700 whitespace-nowrap">
+                        {complaint.category || "Other"}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span
+                        className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full whitespace-nowrap ${getStatusColor(complaint.status)}`}
+                      >
+                        {complaint.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
                       <p className="text-sm text-gray-900 font-medium">
                         {complaint.student?.name || "Unknown"}
                       </p>
@@ -401,13 +447,6 @@ const AdminAllComplaints = () => {
                       <p className="text-sm text-gray-600">
                         {complaint.hostel} / {complaint.roomNumber}
                       </p>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span
-                        className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full whitespace-nowrap ${getStatusColor(complaint.status)}`}
-                      >
-                        {complaint.status}
-                      </span>
                     </td>
                     <td className="px-6 py-4">
                       <p className="text-sm text-gray-600">
@@ -519,6 +558,14 @@ const AdminAllComplaints = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                 <div>
                   <label className="block text-sm font-semibold text-gray-600 mb-2">
+                    Category
+                  </label>
+                  <p className="text-gray-900">
+                    {selectedComplaint.category || "Other"}
+                  </p>
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-600 mb-2">
                     Hostel / Room
                   </label>
                   <p className="text-gray-900">
@@ -561,8 +608,7 @@ const AdminAllComplaints = () => {
                   <div className="flex flex-wrap gap-3">
                     {selectedComplaint.images.map((filename, idx) => {
                       const url = getImageUrl(filename);
-                      const tkn = localStorage.getItem("token");
-                      const authUrl = `${url}?token=${tkn}`;
+                      const authUrl = url;
                       return (
                         <button
                           key={idx}
@@ -629,7 +675,7 @@ const AdminAllComplaints = () => {
                         </span>
                         <span className="text-gray-400">&bull;</span>
                         <span className="text-gray-700">
-                          {slot.startTime} – {slot.endTime}
+                          {slot.startTime} - {slot.endTime}
                         </span>
                       </div>
                     ))}

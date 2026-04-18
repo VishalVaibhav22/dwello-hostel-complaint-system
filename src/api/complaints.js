@@ -15,6 +15,14 @@ export const createComplaint = async (
   formData.append("title", complaintData.title);
   formData.append("description", complaintData.description);
 
+  if (complaintData.hostel) {
+    formData.append("hostel", complaintData.hostel);
+  }
+
+  if (complaintData.roomNumber) {
+    formData.append("roomNumber", complaintData.roomNumber);
+  }
+
   if (availability.length > 0) {
     formData.append("availability", JSON.stringify(availability));
   }
@@ -23,9 +31,7 @@ export const createComplaint = async (
     formData.append("images", file);
   });
 
-  const response = await api.post(API_ROUTES.createComplaint, formData, {
-    headers: { "Content-Type": "multipart/form-data" },
-  });
+  const response = await api.post(API_ROUTES.createComplaint, formData);
   return response.data;
 };
 
@@ -59,9 +65,12 @@ export const getAdminAnalytics = async () => {
   return response.data;
 };
 
-export const getImageUrl = (filename) => {
-  const baseURL = import.meta.env.VITE_API_URL || "http://localhost:5000";
-  return `${baseURL}/uploads/complaints/${filename}`;
+export const getImageUrl = (imageUrl) => {
+  if (!imageUrl) {
+    return "";
+  }
+
+  return imageUrl;
 };
 
 // Notification endpoints
