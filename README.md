@@ -298,6 +298,50 @@ hostel-complaint-management/
 
 ---
 
+## Automation Testing (Selenium + TestNG)
+
+The project includes a dedicated Java automation suite in `DwelloAutomation/` for end-to-end validation of student and admin workflows.
+
+### What this automation covers
+
+- End-to-end UI validation for login, complaint lifecycle, admin actions, and system flows
+- AI-related validation for complaint category and priority rendering
+- Page Object-style reusable base helpers for setup, waits, and common actions
+- Failure diagnostics with screenshots for quick defect triage
+- Test grouping and execution orchestration using TestNG suites
+- Maven-based dependency management and repeatable team execution
+
+### Stack used
+
+- Java 21
+- Selenium WebDriver 4
+- TestNG 7
+- Maven Surefire
+- WebDriverManager
+- Ant (XSLT report transformation)
+
+### Run automation tests
+
+```bash
+cd DwelloAutomation
+mvn clean test
+```
+
+Run a single test method:
+
+```bash
+cd DwelloAutomation
+mvn -Dtest=tests.StudentTest#TC_30_verifyAICategoryAndPriorityAssignment test
+```
+
+Generate transformed TestNG report (Ant + XSL):
+
+```bash
+cd DwelloAutomation
+ant
+```
+---
+
 ## Future Improvements
 
 - Email notifications
@@ -309,4 +353,4 @@ hostel-complaint-management/
 
 ## License
 
-MIT License
+[MIT License](LICENSE.md)

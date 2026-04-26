@@ -3,6 +3,30 @@ node_modules/
 .pnp
 .pnp.js
 
+# Java / Maven
+*.class
+*.jar
+*.war
+*.ear
+target/
+**/target/
+
+# TestNG / Selenium runtime outputs
+test-output/
+**/test-output/
+screenshots/
+**/screenshots/
+
+# Eclipse metadata
+.settings/
+**/.settings/
+.classpath
+**/.classpath
+.project
+**/.project
+bin/
+**/bin/
+
 # Testing
 coverage/
 

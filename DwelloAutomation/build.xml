@@ -1,0 +1,12 @@
+<project name="Generate TestNG Report" default="generate-report">
+
+    <target name="generate-report">
+
+        <xslt 
+            in="test-output/testng-results.xml"
+            style="testng-results.xsl"
+            out="test-output/testng-results.html"/>
+
+    </target>
+
+</project>

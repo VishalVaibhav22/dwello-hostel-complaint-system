@@ -1,0 +1,29 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+
+<suite name="Dwello Automation Suite">
+
+    <test name="Login Tests">
+        <classes>
+            <class name="tests.LoginTest"/>
+        </classes>
+    </test>
+
+    <test name="Student Tests">
+        <classes>
+            <class name="tests.StudentTest"/>
+        </classes>
+    </test>
+
+    <test name="Admin Tests">
+        <classes>
+            <class name="tests.AdminTest"/>
+        </classes>
+    </test>
+
+    <test name="System Tests">
+        <classes>
+            <class name="tests.SystemTest"/>
+        </classes>
+    </test>
+
+</suite>
